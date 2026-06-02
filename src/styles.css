@@ -5,7 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-script: "Caveat", "Sacramento", cursive;
+  --font-display: "Playfair Display", ui-serif, Georgia, serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 
   --radius-sm: calc(var(--radius) - 4px);
@@ -33,42 +34,42 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-rose: var(--rose);
   --color-blush: var(--blush);
+  --color-pink: var(--pink);
+  --color-rose: var(--rose);
   --color-cocoa: var(--cocoa);
 }
 
 :root {
-  --radius: 1rem;
-  /* Warm cream background, deep cocoa text, dusty rose accents */
-  --background: oklch(0.985 0.012 60);
-  --foreground: oklch(0.22 0.035 25);
-  --card: oklch(0.995 0.008 60);
-  --card-foreground: oklch(0.22 0.035 25);
-  --popover: oklch(0.995 0.008 60);
-  --popover-foreground: oklch(0.22 0.035 25);
-  --primary: oklch(0.42 0.09 20);
-  --primary-foreground: oklch(0.985 0.012 60);
-  --secondary: oklch(0.94 0.03 30);
-  --secondary-foreground: oklch(0.3 0.05 25);
-  --muted: oklch(0.95 0.018 50);
-  --muted-foreground: oklch(0.48 0.03 30);
-  --accent: oklch(0.78 0.09 20);
-  --accent-foreground: oklch(0.22 0.035 25);
+  --radius: 1.25rem;
+  /* Soft pink/cream palette inspired by the reference */
+  --background: oklch(0.975 0.012 20);            /* warm blush cream */
+  --foreground: oklch(0.22 0.03 25);              /* deep cocoa text */
+  --card: oklch(0.995 0.006 20);
+  --card-foreground: oklch(0.22 0.03 25);
+  --popover: oklch(0.995 0.006 20);
+  --popover-foreground: oklch(0.22 0.03 25);
+  --primary: oklch(0.62 0.18 10);                  /* dusty rose for CTAs */
+  --primary-foreground: oklch(0.985 0.012 20);
+  --secondary: oklch(0.93 0.035 20);
+  --secondary-foreground: oklch(0.3 0.04 25);
+  --muted: oklch(0.94 0.02 25);
+  --muted-foreground: oklch(0.5 0.03 25);
+  --accent: oklch(0.88 0.07 15);                   /* blush */
+  --accent-foreground: oklch(0.22 0.03 25);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.9 0.02 40);
-  --input: oklch(0.9 0.02 40);
-  --ring: oklch(0.78 0.09 20);
-  --rose: oklch(0.72 0.12 15);
-  --blush: oklch(0.92 0.04 20);
+  --border: oklch(0.9 0.025 20);
+  --input: oklch(0.9 0.025 20);
+  --ring: oklch(0.78 0.1 15);
+  --blush: oklch(0.93 0.045 15);
+  --pink: oklch(0.78 0.18 0);                      /* hot pink accent (logo) */
+  --rose: oklch(0.62 0.18 10);
   --cocoa: oklch(0.32 0.05 30);
 }
 
 @layer base {
-  * {
-    border-color: var(--color-border);
-  }
+  * { border-color: var(--color-border); }
 
   html, body {
     background-color: var(--color-background);
@@ -79,7 +80,15 @@
 
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    font-weight: 400;
+    font-weight: 700;
     letter-spacing: -0.02em;
   }
+}
+
+/* Decorative underline used on hero callouts */
+.deco-underline {
+  background-image: linear-gradient(transparent 70%, color-mix(in oklab, var(--pink) 55%, transparent) 70%);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  padding: 0 .05em;
 }
