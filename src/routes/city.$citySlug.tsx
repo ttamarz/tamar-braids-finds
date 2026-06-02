@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { getCity } from "@/data/cities";
+import { getCity, type Braider } from "@/data/cities";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
 import { Instagram, ArrowLeft } from "lucide-react";
 
@@ -70,7 +70,7 @@ function CityPage() {
       {/* Braiders */}
       <section className="mx-auto max-w-6xl px-6 -mt-20 relative z-10">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {city.braiders.map((b) => (
+          {city.braiders.map((b: Braider) => (
             <article
               key={b.instagram}
               className="group rounded-3xl bg-card border border-border/60 overflow-hidden shadow-sm hover:shadow-[0_20px_60px_-20px_rgba(120,40,50,0.2)] transition-all duration-500 hover:-translate-y-1"
@@ -96,7 +96,7 @@ function CityPage() {
                   {b.bio}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {b.styles.map((s) => (
+                  {b.styles.map((s: string) => (
                     <span
                       key={s}
                       className="text-xs px-3 py-1 rounded-full bg-[color:var(--blush)] text-[color:var(--cocoa)]"
