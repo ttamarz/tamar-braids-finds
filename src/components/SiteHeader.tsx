@@ -18,12 +18,12 @@ export function SiteHeader() {
           >
             Discover
           </Link>
-          <a href="#blog" className="px-4 py-2 rounded-full text-foreground/80 hover:text-foreground">
+          <Link to="/blog" className="px-4 py-2 rounded-full text-foreground/80 hover:text-foreground">
             Blog
-          </a>
-          <a href="#stylists" className="px-4 py-2 rounded-full text-foreground/80 hover:text-foreground">
+          </Link>
+          <Link to="/for-stylists" className="px-4 py-2 rounded-full text-foreground/80 hover:text-foreground">
             For Stylists
-          </a>
+          </Link>
         </nav>
 
         <div className="flex items-center gap-2 text-sm">
@@ -46,14 +46,14 @@ export function SiteFooter() {
         <div>
           <img src={logo.url} alt="Tamar Finds" className="h-10 w-auto" />
           <p className="mt-4 text-muted-foreground max-w-md leading-relaxed">
-            Een handgekozen directory van vlechters in Nederland. Geen
-            nep-reviews, geen ads — alleen stylisten die het waard zijn.
+            Tamar Finds helpt je betrouwbare braiders en hairstylists in
+            Nederland ontdekken — zonder eindeloos zoeken op Instagram.
           </p>
         </div>
         <div className="sm:text-right text-sm text-muted-foreground">
           <p>© {new Date().getFullYear()} Tamar Finds</p>
           <p className="mt-1 italic font-[family-name:var(--font-script)] text-2xl text-foreground">
-            crowns, woven with care
+            Find your next crown.
           </p>
         </div>
       </div>
