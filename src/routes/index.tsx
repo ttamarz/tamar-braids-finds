@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import { cities, styleCategories } from "@/data/cities";
+import { blogPosts } from "@/data/blog";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
 import { Search, MapPin, Star, Bookmark, Shield, Camera, Heart, ArrowRight, Sparkles } from "lucide-react";
 
@@ -28,7 +30,52 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
+type Result = {
+  b: (typeof cities)[number]["braiders"][number];
+  city: (typeof cities)[number];
+};
+
 function Home() {
+  const [query, setQuery] = useState("");
+
+  const allResults: Result[] = useMemo(
+    () => cities.flatMap((c) => c.braiders.map((b) => ({ b, city: c }))),
+    []
+  );
+
+  const trimmed = query.trim().toLowerCase();
+  const isSearching = trimmed.length > 0;
+
+  const results = useMemo(() => {
+    if (!isSearching) return allResults.slice(0, 8);
+    return allResults.filter(({ b, city }) => {
+      const hay = [
+        b.name,
+        b.bio,
+        b.instagram,
+        city.name,
+        city.tagline,
+        ...b.styles,
+      ]
+        .join(" ")
+        .toLowerCase();
+      return hay.includes(trimmed);
+    });
+  }, [trimmed, isSearching, allResults]);
+
+  const scrollToResults = () => {
+    setTimeout(() => {
+      document
+        .getElementById("results")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 60);
+  };
+
+  const setQueryAndScroll = (q: string) => {
+    setQuery(q);
+    scrollToResults();
+  };
+
   return (
     <div className="min-h-screen">
       <SiteHeader />
@@ -37,12 +84,10 @@ function Home() {
       <section className="mx-auto max-w-7xl px-4 sm:px-6 pt-6">
         <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[color:var(--blush)] via-[color:var(--blush)]/70 to-[color:var(--background)] p-6 sm:p-10 lg:p-14">
           <div className="grid lg:grid-cols-[1fr_1.1fr_auto] gap-8 items-center">
-            {/* Portrait */}
             <div className="relative aspect-[4/5] max-w-sm lg:max-w-none rounded-[1.5rem] overflow-hidden shadow-xl">
               <img src={heroPortrait} alt="Braided model" className="h-full w-full object-cover" />
             </div>
 
-            {/* Copy & search */}
             <div className="relative">
               <p className="font-[family-name:var(--font-script)] text-4xl sm:text-5xl text-foreground leading-none">
                 Find trusted
@@ -56,38 +101,55 @@ function Home() {
               </p>
 
               {/* Search bar */}
-              <div className="mt-7 flex items-center gap-2 rounded-full bg-card border border-border shadow-sm p-2 pl-5">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  scrollToResults();
+                }}
+                className="mt-7 flex items-center gap-2 rounded-full bg-card border border-border shadow-sm p-2 pl-5"
+              >
                 <MapPin className="h-5 w-5 text-muted-foreground shrink-0" />
                 <input
                   type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
                   placeholder="Zoek stad, stijl of vlechter…"
                   className="flex-1 bg-transparent outline-none text-sm sm:text-base placeholder:text-muted-foreground py-2"
                 />
+                {query && (
+                  <button
+                    type="button"
+                    onClick={() => setQuery("")}
+                    className="text-xs text-muted-foreground hover:text-foreground px-2"
+                  >
+                    Wis
+                  </button>
+                )}
                 <button
+                  type="submit"
                   aria-label="Search"
                   className="h-11 w-11 rounded-full bg-[color:var(--primary)] text-primary-foreground flex items-center justify-center hover:opacity-90 transition-opacity"
                 >
                   <Search className="h-5 w-5" />
                 </button>
-              </div>
+              </form>
 
               {/* Popular chips */}
               <div className="mt-5 flex flex-wrap items-center gap-2">
                 <span className="text-sm font-semibold mr-1">Popular:</span>
                 {cities.map((c) => (
-                  <Link
+                  <button
                     key={c.slug}
-                    to="/city/$citySlug"
-                    params={{ citySlug: c.slug }}
+                    type="button"
+                    onClick={() => setQueryAndScroll(c.name)}
                     className="px-4 py-1.5 rounded-full border border-border bg-card text-sm hover:bg-[color:var(--blush)] hover:border-[color:var(--rose)]/40 transition-colors"
                   >
                     {c.name}
-                  </Link>
+                  </button>
                 ))}
               </div>
             </div>
 
-            {/* Polaroids */}
             <div className="hidden lg:block relative w-[220px] h-[360px]">
               <div className="absolute top-0 right-4 rotate-[6deg] p-2 pb-6 bg-white shadow-lg rounded-sm">
                 <img src={polaroid1} alt="" className="w-40 h-48 object-cover" />
@@ -101,87 +163,109 @@ function Home() {
         </div>
       </section>
 
-      {/* FEATURED + SIDEBAR */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 mt-10 grid lg:grid-cols-[1.6fr_1fr] gap-6">
-        {/* Featured stylists */}
+      {/* RESULTS + SIDEBAR */}
+      <section id="results" className="mx-auto max-w-7xl px-4 sm:px-6 mt-10 grid lg:grid-cols-[1.6fr_1fr] gap-6">
         <div className="rounded-[1.5rem] bg-card border border-border/60 p-6 sm:p-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="font-display text-2xl flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-[color:var(--pink)]" />
               <span className="uppercase tracking-[0.15em] text-sm font-semibold text-foreground">
-                Featured Stylists
+                {isSearching
+                  ? `Resultaten · ${results.length}`
+                  : "Featured Stylists"}
               </span>
             </h2>
-            <a href="#all" className="text-sm font-medium inline-flex items-center gap-1 text-foreground hover:text-[color:var(--rose)]">
-              View all <ArrowRight className="h-4 w-4" />
-            </a>
+            {isSearching ? (
+              <button
+                type="button"
+                onClick={() => setQuery("")}
+                className="text-sm font-medium inline-flex items-center gap-1 text-foreground hover:text-[color:var(--rose)]"
+              >
+                Wis zoekopdracht
+              </button>
+            ) : null}
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {cities.flatMap((c) => c.braiders.map((b) => ({ b, city: c }))).slice(0, 8).map(({ b, city }) => (
-              <Link
-                key={b.instagram}
-                to="/city/$citySlug"
-                params={{ citySlug: city.slug }}
-                className="group block"
-              >
-                <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-muted">
-                  <img src={b.photo} alt={b.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                  <span className="absolute top-2 left-2 inline-flex items-center gap-1 bg-[color:var(--blush)]/95 backdrop-blur text-[11px] font-semibold px-2 py-1 rounded-full">
-                    <Star className="h-3 w-3 fill-[color:var(--pink)] text-[color:var(--pink)]" />
-                    {b.rating.toFixed(1)}
-                  </span>
-                  <span className="absolute top-2 right-2 h-7 w-7 bg-white/90 rounded-full flex items-center justify-center">
-                    <Bookmark className="h-3.5 w-3.5" />
-                  </span>
-                </div>
-                <div className="mt-3 flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <h3 className="font-display text-base leading-tight truncate">{b.name}</h3>
-                    <p className="text-xs text-muted-foreground inline-flex items-center gap-1 mt-0.5">
-                      <MapPin className="h-3 w-3" /> {city.name}
-                    </p>
+          {results.length === 0 ? (
+            <div className="py-16 text-center">
+              <p className="font-display text-2xl">Geen resultaten</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Probeer een andere stad, stijl of vlechternaam.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {results.map(({ b, city }) => (
+                <Link
+                  key={`${city.slug}-${b.instagram}`}
+                  to="/city/$citySlug"
+                  params={{ citySlug: city.slug }}
+                  className="group block"
+                >
+                  <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-muted">
+                    <img src={b.photo} alt={b.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                    <span className="absolute top-2 left-2 inline-flex items-center gap-1 bg-[color:var(--blush)]/95 backdrop-blur text-[11px] font-semibold px-2 py-1 rounded-full">
+                      <Star className="h-3 w-3 fill-[color:var(--pink)] text-[color:var(--pink)]" />
+                      {b.rating.toFixed(1)}
+                    </span>
+                    <span className="absolute top-2 right-2 h-7 w-7 bg-white/90 rounded-full flex items-center justify-center">
+                      <Bookmark className="h-3.5 w-3.5" />
+                    </span>
                   </div>
-                  <span className="text-xs font-semibold text-[color:var(--rose)] shrink-0">{b.priceTier}</span>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">{b.reviews} reviews</p>
-              </Link>
-            ))}
-          </div>
+                  <div className="mt-3 flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <h3 className="font-display text-base leading-tight truncate">{b.name}</h3>
+                      <p className="text-xs text-muted-foreground inline-flex items-center gap-1 mt-0.5">
+                        <MapPin className="h-3 w-3" /> {city.name}
+                      </p>
+                    </div>
+                    <span className="text-xs font-semibold text-[color:var(--rose)] shrink-0">{b.priceTier}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">{b.reviews} reviews</p>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Sidebar */}
         <aside className="flex flex-col gap-6">
-          {/* Browse by style */}
           <div className="rounded-[1.5rem] bg-card border border-border/60 p-6">
             <h2 className="uppercase tracking-[0.15em] text-sm font-semibold mb-5">Browse by style</h2>
             <div className="grid grid-cols-5 gap-3">
               {styleCategories.map((s) => (
-                <a key={s.name} href="#style" className="group text-center">
+                <button
+                  key={s.name}
+                  type="button"
+                  onClick={() => setQueryAndScroll(s.name)}
+                  className="group text-center"
+                >
                   <div className="aspect-square rounded-full overflow-hidden ring-2 ring-[color:var(--blush)] group-hover:ring-[color:var(--pink)] transition-all">
                     <img src={s.photo} alt={s.name} loading="lazy" className="h-full w-full object-cover" />
                   </div>
                   <p className="mt-2 text-[11px] leading-tight font-medium">{s.name}</p>
-                </a>
+                </button>
               ))}
             </div>
           </div>
 
-          {/* For stylists CTA */}
-          <div id="stylists" className="relative rounded-[1.5rem] bg-[color:var(--blush)] p-6 overflow-hidden">
+          <Link
+            to="/for-stylists"
+            className="relative block rounded-[1.5rem] bg-[color:var(--blush)] p-6 overflow-hidden hover:opacity-95 transition-opacity"
+          >
             <div className="max-w-[60%]">
               <h3 className="font-display text-2xl leading-tight">Are you a braider?</h3>
               <p className="mt-2 text-sm text-foreground/75">
                 Word ontdekt door nieuwe klanten en laat je business groeien.
               </p>
-              <button className="mt-4 inline-flex items-center gap-2 bg-foreground text-background text-sm font-semibold rounded-full px-5 py-2.5 hover:opacity-90 transition-opacity">
+              <span className="mt-4 inline-flex items-center gap-2 bg-foreground text-background text-sm font-semibold rounded-full px-5 py-2.5">
                 List your business <ArrowRight className="h-4 w-4" />
-              </button>
+              </span>
             </div>
             <div className="absolute right-3 bottom-3 w-28 h-32 rotate-[6deg] p-1.5 pb-4 bg-white shadow-md rounded-sm hidden sm:block">
               <img src={stylistCta} alt="" className="w-full h-full object-cover" />
             </div>
-          </div>
+          </Link>
         </aside>
       </section>
 
@@ -205,60 +289,31 @@ function Home() {
         </div>
       </section>
 
-      {/* CITIES */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 mt-16">
-        <div className="flex items-end justify-between mb-6">
-          <h2 className="font-display text-3xl sm:text-4xl">Browse by city</h2>
-          <span className="text-sm text-muted-foreground hidden sm:inline">
-            {cities.length} steden · meer onderweg
-          </span>
-        </div>
-
-        <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {cities.map((city) => (
-            <Link
-              key={city.slug}
-              to="/city/$citySlug"
-              params={{ citySlug: city.slug }}
-              className="group block"
-            >
-              <article className="relative aspect-[4/5] overflow-hidden rounded-3xl bg-card border border-border/60 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_60px_-20px_rgba(180,80,120,0.3)]">
-                <img src={city.cover} alt={city.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] group-hover:scale-105" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-6 text-white">
-                  <h3 className="font-display text-3xl sm:text-4xl text-white">{city.name}</h3>
-                  <p className="mt-1 text-sm opacity-90">{city.braiders.length} vlechters</p>
-                </div>
-              </article>
-            </Link>
-          ))}
-        </div>
-      </section>
-
       {/* BLOG TEASER */}
       <section id="blog" className="mx-auto max-w-7xl px-4 sm:px-6 mt-16">
         <div className="flex items-end justify-between mb-6">
           <h2 className="uppercase tracking-[0.15em] text-sm font-semibold">Latest from the blog</h2>
-          <a href="#all" className="text-sm font-medium inline-flex items-center gap-1 hover:text-[color:var(--rose)]">
+          <Link to="/blog" className="text-sm font-medium inline-flex items-center gap-1 hover:text-[color:var(--rose)]">
             View all <ArrowRight className="h-4 w-4" />
-          </a>
+          </Link>
         </div>
         <div className="grid sm:grid-cols-3 gap-6">
-          {[
-            { tag: "Guide", title: "How to avoid traction alopecia", img: "photo-1531123897727-8f129e1688ce", read: "5 min read" },
-            { tag: "Tips", title: "Best styles for 4C hair in summer", img: "photo-1594744803329-e58b31de8bf5", read: "7 min read" },
-            { tag: "Moving", title: "Verhuisd? Vind snel een nieuwe vlechter", img: "photo-1605497788044-5a32c7078486", read: "6 min read" },
-          ].map((p) => (
-            <a key={p.title} href="#post" className="group flex gap-4 items-center">
+          {blogPosts.map((p) => (
+            <Link
+              key={p.slug}
+              to="/blog/$slug"
+              params={{ slug: p.slug }}
+              className="group flex gap-4 items-center"
+            >
               <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-2xl overflow-hidden shrink-0">
-                <img src={`https://images.unsplash.com/${p.img}?auto=format&fit=crop&w=300&q=80`} alt="" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                <img src={p.image} alt="" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
               </div>
               <div>
                 <span className="inline-block text-[10px] uppercase tracking-[0.18em] font-semibold bg-[color:var(--blush)] px-2 py-1 rounded-full">{p.tag}</span>
                 <h3 className="font-display text-lg leading-tight mt-2 group-hover:text-[color:var(--rose)] transition-colors">{p.title}</h3>
-                <p className="text-xs text-muted-foreground mt-1">{p.read}</p>
+                <p className="text-xs text-muted-foreground mt-1">{p.readTime}</p>
               </div>
-            </a>
+            </Link>
           ))}
         </div>
       </section>
