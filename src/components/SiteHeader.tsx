@@ -24,6 +24,9 @@ export function SiteHeader() {
           <Link to="/for-stylists" className="px-4 py-2 rounded-full text-foreground/80 hover:text-foreground">
             For Stylists
           </Link>
+          <Link to="/admin/stylists" className="px-4 py-2 rounded-full text-foreground/60 hover:text-foreground text-xs uppercase tracking-wider">
+            Admin
+          </Link>
         </nav>
 
         <div className="flex items-center gap-2 text-sm">
