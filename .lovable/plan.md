@@ -1,60 +1,75 @@
-# Tamar Finds — Functionality Update Plan
+# Editable stylists with admin panel
 
-Scope: functionality + small content edits only. No visual redesign. Keep current pink/feminine layout, fonts, and colors.
+Replace the hard-coded stylist data with a real database you control from an admin page protected by email/password login. The public homepage, search, and city pages all read from the same database.
 
-## 1. Functional search bar (homepage)
+## 1. Enable Lovable Cloud
 
-In `src/routes/index.tsx`:
-- Convert the hero search into a controlled input with React state (`query`).
-- Filter the "Featured Stylists" grid live by matching `query` (case-insensitive) against:
-  - braider `name`
-  - city `name`
-  - any entry in `styles`
-  - braider `bio` (keyword catch-all)
-- When `query` is non-empty:
-  - Rename the section heading from "Featured Stylists" to "Search results" and show a result count.
-  - Show all matches across cities (not capped at 8).
-  - Render an empty-state message ("Geen resultaten — probeer een andere stad of stijl") when zero matches.
-- "Popular" city chips: convert from `<Link>` to buttons that set `query` to the city name (and scroll to the results grid). This makes them act as filters per the request.
+Turn on Lovable Cloud (database + auth + storage). This is the backend for everything below — no external accounts needed.
 
-No data shape changes to `src/data/cities.ts`.
+## 2. Database
 
-## 2. Remove "Browse by city" section
+Create one table:
 
-In `src/routes/index.tsx`, delete the entire `{/* CITIES */}` section (heading + the grid mapping `cities` to large image cards). City pages (`/city/$citySlug`) and the data file stay intact so existing routes keep working and search can still surface city matches.
+**`stylists`**
+- `id` (uuid, primary key)
+- `name` (text)
+- `city` (text) — e.g. "Amsterdam", "Rotterdam"
+- `instagram_url` (text)
+- `image_url` (text) — pasted URL
+- `rating` (numeric, 0–5)
+- `reviews_count` (integer)
+- `price_min` (integer, EUR)
+- `price_max` (integer, EUR)
+- `specialties` (text array) — e.g. ["Box Braids", "Knotless"]
+- `bio` (text)
+- `created_at` (timestamptz)
 
-## 3. Blog: clickable items + overview + article pages
+**Security (RLS):**
+- Anyone (anon + authenticated) can `SELECT` — the public site needs to read.
+- Only authenticated users can `INSERT` / `UPDATE` / `DELETE` — that's you, once logged in.
 
-- Extract blog posts into `src/data/blog.ts` with: `slug`, `title`, `tag`, `readTime`, `image`, `excerpt`, `body` (a few paragraphs of placeholder Dutch copy per post). Seed with the 3 existing items.
-- New route `src/routes/blog.index.tsx` → `/blog`: overview grid of all posts, same card styling as current teaser, keeps the pink aesthetic.
-- New route `src/routes/blog.$slug.tsx` → `/blog/$slug`: simple article page (hero image, tag, title, read time, body paragraphs, back link). Uses `notFound()` for unknown slugs, plus `head()` per post for SEO.
-- In `src/routes/index.tsx`, wrap each blog teaser in `<Link to="/blog/$slug">` and point "View all" to `/blog`.
+**Seed:** insert the ~11 current placeholder stylists so the site isn't empty on first load. You can edit or delete each from the admin page.
 
-## 4. "Are you a braider?" → For Stylists page
+## 3. Auth (email + password)
 
-- Wrap the existing CTA card in `src/routes/index.tsx` with `<Link to="/for-stylists">` (preserve styling).
-- New route `src/routes/for-stylists.tsx` → `/for-stylists`:
-  - Short intro explaining how Tamar Finds curates and lists braiders (free listing, vetted, photo reviews, etc.) — Dutch copy, matching tone.
-  - Form fields: Naam, Bedrijfsnaam, Stad, Instagram-link, Specialiteiten (textarea/tags), Prijsklasse (select: €, €€, €€€), Contact e-mail.
-  - Client-side validation with `zod` + react-hook-form (already in the stack via shadcn `form`). On submit, show a success toast ("Bedankt! We nemen binnen 5 werkdagen contact op.") and reset the form. No backend — submission stays client-side for now (can be wired to Lovable Cloud later if desired).
+- Add a single sign-in page at `/admin/login`.
+- Email/password only — no Google, no signup link in the UI (you'll create your account once via the Cloud user panel, or via a one-time signup screen we hide afterwards).
+- Logging in unlocks `/admin`. Logging out returns to the public site.
 
-## 5. Footer copy
+## 4. Admin page `/admin/stylists` (protected)
 
-In `src/components/SiteHeader.tsx` (`SiteFooter`):
-- Replace the Dutch tagline paragraph with: "Tamar Finds helpt je betrouwbare braiders en hairstylists in Nederland ontdekken — zonder eindeloos zoeken op Instagram."
-- Replace "crowns woven with care" with "Find your next crown."
+- Table/list of all stylists with: photo thumb, name, city, rating, edit + delete buttons.
+- "Add stylist" button opens a form (same form used for edits) with every field from section 2 plus:
+  - Specialties: tag input (type + enter, comma-separated)
+  - Price range: two number inputs (min / max EUR)
+  - Image URL: text field with a live preview thumbnail
+- Form uses react-hook-form + zod validation (Instagram URL format, rating 0–5, price_min ≤ price_max, required fields).
+- Delete shows a confirm dialog.
+- Toast notifications on success/error.
 
-## Files touched
+## 5. Public site reads from the database
 
-- edit `src/routes/index.tsx` (search state, remove cities section, blog/CTA links)
-- edit `src/components/SiteHeader.tsx` (footer copy)
-- new `src/data/blog.ts`
-- new `src/routes/blog.index.tsx`
-- new `src/routes/blog.$slug.tsx`
-- new `src/routes/for-stylists.tsx`
-- auto-regenerated `src/routeTree.gen.ts`
+- Homepage "Search results" grid: fetch all stylists from DB, run the existing client-side search filter against this live list (name / city / specialties / bio).
+- City pages (`/city/$citySlug`): fetch stylists filtered by `city` matching the city name.
+- Popular city chips and "Browse by style" circles keep working — they just set the same search query.
+- Remove `src/data/cities.ts` braider arrays; keep only the city name list (used for chips + city page routes).
 
-## Out of scope
+## 6. Header
 
-- No changes to color tokens, fonts, hero layout, sidebar, trust badges, or city detail pages.
-- No backend wiring for the stylist form (client-only success state).
+Add a small "Admin" link in the header that goes to `/admin/stylists` when logged in, or `/admin/login` when not.
+
+---
+
+### Technical notes
+
+- TanStack Start server functions (`createServerFn`) for all DB reads/writes. Public reads use a public server fn with `supabaseAdmin` + safe column projection; writes use `requireSupabaseAuth`.
+- Loader pattern: `ensureQueryData(stylistsQueryOptions)` in route loader, `useSuspenseQuery` in component.
+- Protected admin routes live under `src/routes/_authenticated/admin.stylists.tsx` using the integration-managed auth gate.
+- Image uploads are out of scope — image is a pasted URL string only.
+- No changes to fonts, colors, hero layout, or visual identity.
+
+### Out of scope
+
+- Image file uploads (URL only, per your choice).
+- Multi-user roles — single admin account.
+- Approval workflow for the "For Stylists" public submission form (still saves nowhere; that's a follow-up).

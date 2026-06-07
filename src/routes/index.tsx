@@ -1,8 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { cities, styleCategories } from "@/data/cities";
 import { blogPosts } from "@/data/blog";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
+import { stylistsQueryOptions } from "@/lib/stylistsQuery";
+import type { Stylist } from "@/lib/stylists.functions";
 import { Search, MapPin, Star, Bookmark, Shield, Camera, Heart, ArrowRight, Sparkles } from "lucide-react";
 
 const heroPortrait =
@@ -14,7 +17,11 @@ const polaroid2 =
 const stylistCta =
   "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=600&q=85";
 
+const fallbackImage =
+  "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=800&q=80";
+
 export const Route = createFileRoute("/")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(stylistsQueryOptions),
   head: () => ({
     meta: [
       { title: "Tamar Finds — Vind vertrouwde vlechters in Nederland" },
@@ -28,46 +35,49 @@ export const Route = createFileRoute("/")({
     ],
   }),
   component: Home,
+  errorComponent: ({ error }) => (
+    <div className="p-10 text-center text-sm text-muted-foreground">{error.message}</div>
+  ),
+  notFoundComponent: () => <div className="p-10 text-center">Niet gevonden.</div>,
 });
 
-type Result = {
-  b: (typeof cities)[number]["braiders"][number];
-  city: (typeof cities)[number];
-};
+function priceTier(min: number): string {
+  if (min >= 180) return "€€€";
+  if (min >= 120) return "€€";
+  return "€";
+}
+
+function citySlugFor(name: string): string {
+  const match = cities.find((c) => c.name.toLowerCase() === name.toLowerCase());
+  return match?.slug ?? name.toLowerCase().replace(/\s+/g, "-");
+}
 
 function Home() {
+  const { data: stylists } = useSuspenseQuery(stylistsQueryOptions);
   const [query, setQuery] = useState("");
-
-  const allResults: Result[] = useMemo(
-    () => cities.flatMap((c) => c.braiders.map((b) => ({ b, city: c }))),
-    []
-  );
 
   const trimmed = query.trim().toLowerCase();
   const isSearching = trimmed.length > 0;
 
   const results = useMemo(() => {
-    if (!isSearching) return allResults.slice(0, 8);
-    return allResults.filter(({ b, city }) => {
+    if (!isSearching) return stylists.slice(0, 8);
+    return stylists.filter((s: Stylist) => {
       const hay = [
-        b.name,
-        b.bio,
-        b.instagram,
-        city.name,
-        city.tagline,
-        ...b.styles,
+        s.name,
+        s.bio ?? "",
+        s.instagram_url ?? "",
+        s.city,
+        ...s.specialties,
       ]
         .join(" ")
         .toLowerCase();
       return hay.includes(trimmed);
     });
-  }, [trimmed, isSearching, allResults]);
+  }, [trimmed, isSearching, stylists]);
 
   const scrollToResults = () => {
     setTimeout(() => {
-      document
-        .getElementById("results")
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      document.getElementById("results")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 60);
   };
 
@@ -100,7 +110,6 @@ function Home() {
                 Stop gambling with <span className="deco-underline font-semibold">your edges.</span>
               </p>
 
-              {/* Search bar */}
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -134,7 +143,6 @@ function Home() {
                 </button>
               </form>
 
-              {/* Popular chips */}
               <div className="mt-5 flex flex-wrap items-center gap-2">
                 <span className="text-sm font-semibold mr-1">Popular:</span>
                 {cities.map((c) => (
@@ -170,9 +178,7 @@ function Home() {
             <h2 className="font-display text-2xl flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-[color:var(--pink)]" />
               <span className="uppercase tracking-[0.15em] text-sm font-semibold text-foreground">
-                {isSearching
-                  ? `Resultaten · ${results.length}`
-                  : "Featured Stylists"}
+                {isSearching ? `Resultaten · ${results.length}` : "Featured Stylists"}
               </span>
             </h2>
             {isSearching ? (
@@ -195,18 +201,23 @@ function Home() {
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {results.map(({ b, city }) => (
+              {results.map((s) => (
                 <Link
-                  key={`${city.slug}-${b.instagram}`}
+                  key={s.id}
                   to="/city/$citySlug"
-                  params={{ citySlug: city.slug }}
+                  params={{ citySlug: citySlugFor(s.city) }}
                   className="group block"
                 >
                   <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-muted">
-                    <img src={b.photo} alt={b.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                    <img
+                      src={s.image_url || fallbackImage}
+                      alt={s.name}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
                     <span className="absolute top-2 left-2 inline-flex items-center gap-1 bg-[color:var(--blush)]/95 backdrop-blur text-[11px] font-semibold px-2 py-1 rounded-full">
                       <Star className="h-3 w-3 fill-[color:var(--pink)] text-[color:var(--pink)]" />
-                      {b.rating.toFixed(1)}
+                      {Number(s.rating).toFixed(1)}
                     </span>
                     <span className="absolute top-2 right-2 h-7 w-7 bg-white/90 rounded-full flex items-center justify-center">
                       <Bookmark className="h-3.5 w-3.5" />
@@ -214,21 +225,22 @@ function Home() {
                   </div>
                   <div className="mt-3 flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <h3 className="font-display text-base leading-tight truncate">{b.name}</h3>
+                      <h3 className="font-display text-base leading-tight truncate">{s.name}</h3>
                       <p className="text-xs text-muted-foreground inline-flex items-center gap-1 mt-0.5">
-                        <MapPin className="h-3 w-3" /> {city.name}
+                        <MapPin className="h-3 w-3" /> {s.city}
                       </p>
                     </div>
-                    <span className="text-xs font-semibold text-[color:var(--rose)] shrink-0">{b.priceTier}</span>
+                    <span className="text-xs font-semibold text-[color:var(--rose)] shrink-0">
+                      {priceTier(s.price_min)}
+                    </span>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">{b.reviews} reviews</p>
+                  <p className="text-xs text-muted-foreground mt-1">{s.reviews_count} reviews</p>
                 </Link>
               ))}
             </div>
           )}
         </div>
 
-        {/* Sidebar */}
         <aside className="flex flex-col gap-6">
           <div className="rounded-[1.5rem] bg-card border border-border/60 p-6">
             <h2 className="uppercase tracking-[0.15em] text-sm font-semibold mb-5">Browse by style</h2>
@@ -269,7 +281,6 @@ function Home() {
         </aside>
       </section>
 
-      {/* TRUST BADGES */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 mt-10">
         <div className="rounded-[1.5rem] bg-card border border-border/60 p-6 sm:p-8 grid grid-cols-2 sm:grid-cols-4 gap-6">
           {[
@@ -289,7 +300,6 @@ function Home() {
         </div>
       </section>
 
-      {/* BLOG TEASER */}
       <section id="blog" className="mx-auto max-w-7xl px-4 sm:px-6 mt-16">
         <div className="flex items-end justify-between mb-6">
           <h2 className="uppercase tracking-[0.15em] text-sm font-semibold">Latest from the blog</h2>
