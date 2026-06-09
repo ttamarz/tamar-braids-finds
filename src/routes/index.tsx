@@ -219,9 +219,20 @@ function Home() {
                       <Star className="h-3 w-3 fill-[color:var(--pink)] text-[color:var(--pink)]" />
                       {Number(s.rating).toFixed(1)}
                     </span>
-                    <span className="absolute top-2 right-2 h-7 w-7 bg-white/90 rounded-full flex items-center justify-center">
-                      <Bookmark className="h-3.5 w-3.5" />
-                    </span>
+                    <button
+                      type="button"
+                      aria-label={isSaved(s.id) ? "Remove from saved" : "Save stylist"}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggle(s.id);
+                      }}
+                      className="absolute top-2 right-2 h-7 w-7 bg-white/90 rounded-full flex items-center justify-center hover:bg-white"
+                    >
+                      <Bookmark
+                        className={`h-3.5 w-3.5 ${isSaved(s.id) ? "fill-[color:var(--rose)] text-[color:var(--rose)]" : ""}`}
+                      />
+                    </button>
                   </div>
                   <div className="mt-3 flex items-start justify-between gap-2">
                     <div className="min-w-0">
