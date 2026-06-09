@@ -61,12 +61,10 @@ export const listStylists = createServerFn({ method: "GET" }).handler(async () =
 });
 
 async function assertAdmin(supabase: any, userId: string) {
-  const { data, error } = await supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userId)
-    .eq("role", "admin")
-    .maybeSingle();
+  const { data, error } = await supabase.rpc("has_role", {
+    _user_id: userId,
+    _role: "admin",
+  });
   if (error) throw new Error(error.message);
   if (!data) throw new Error("Forbidden: admin role required");
 }
@@ -115,11 +113,10 @@ export const deleteStylist = createServerFn({ method: "POST" })
 export const checkIsAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data } = await context.supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", context.userId)
-      .eq("role", "admin")
-      .maybeSingle();
+    const { data, error } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (error) return { isAdmin: false };
     return { isAdmin: !!data };
   });
