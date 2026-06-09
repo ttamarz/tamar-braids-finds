@@ -18,9 +18,6 @@ export function SiteHeader() {
           >
             Discover
           </Link>
-          <Link to="/blog" className="px-4 py-2 rounded-full text-foreground/80 hover:text-foreground">
-            Blog
-          </Link>
           <Link to="/for-stylists" className="px-4 py-2 rounded-full text-foreground/80 hover:text-foreground">
             For Stylists
           </Link>
@@ -30,12 +27,19 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2 text-sm">
-          <button className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-full hover:bg-[color:var(--blush)] transition-colors">
+          <Link
+            to="/"
+            hash="results"
+            className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-full hover:bg-[color:var(--blush)] transition-colors"
+          >
             <Search className="h-4 w-4" /> Search
-          </button>
-          <button className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-full hover:bg-[color:var(--blush)] transition-colors">
-            <Heart className="h-4 w-4" /> Saved
-          </button>
+          </Link>
+          <Link
+            to="/saved"
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-full hover:bg-[color:var(--blush)] transition-colors"
+          >
+            <Heart className="h-4 w-4" /> <span className="hidden sm:inline">Saved</span>
+          </Link>
         </div>
       </div>
     </header>
