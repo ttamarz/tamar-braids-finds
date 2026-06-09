@@ -54,6 +54,7 @@ function citySlugFor(name: string): string {
 
 function Home() {
   const { data: stylists } = useSuspenseQuery(stylistsQueryOptions);
+  const { isSaved, toggle } = useSavedStylists();
   const [query, setQuery] = useState("");
 
   const trimmed = query.trim().toLowerCase();
