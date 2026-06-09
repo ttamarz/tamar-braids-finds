@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      stylist_requests: {
+        Row: {
+          budget: string
+          city: string
+          created_at: string
+          email: string
+          hairstyle: string
+          id: string
+          name: string
+          notes: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          budget: string
+          city: string
+          created_at?: string
+          email: string
+          hairstyle: string
+          id?: string
+          name: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          budget?: string
+          city?: string
+          created_at?: string
+          email?: string
+          hairstyle?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       stylists: {
         Row: {
           bio: string | null

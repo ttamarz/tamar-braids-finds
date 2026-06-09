@@ -4,6 +4,7 @@ import { getCity } from "@/data/cities";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
 import { stylistsQueryOptions } from "@/lib/stylistsQuery";
 import type { Stylist } from "@/lib/stylists.functions";
+import { useSavedStylists } from "@/hooks/useSavedStylists";
 import { Instagram, ArrowLeft, Star, Bookmark, MapPin } from "lucide-react";
 
 const fallbackImage =
@@ -40,6 +41,7 @@ export const Route = createFileRoute("/city/$citySlug")({
 function CityPage() {
   const { city } = Route.useLoaderData();
   const { data: all } = useSuspenseQuery(stylistsQueryOptions);
+  const { isSaved, toggle } = useSavedStylists();
   const stylists = all.filter(
     (s: Stylist) => s.city.toLowerCase() === city.name.toLowerCase()
   );
@@ -88,8 +90,13 @@ function CityPage() {
                     <Star className="h-3 w-3 fill-[color:var(--pink)] text-[color:var(--pink)]" />
                     {Number(b.rating).toFixed(1)}
                   </span>
-                  <button aria-label="Save" className="absolute top-3 right-3 h-8 w-8 bg-white/90 rounded-full flex items-center justify-center hover:bg-white">
-                    <Bookmark className="h-4 w-4" />
+                  <button
+                    type="button"
+                    aria-label={isSaved(b.id) ? "Remove from saved" : "Save stylist"}
+                    onClick={() => toggle(b.id)}
+                    className="absolute top-3 right-3 h-8 w-8 bg-white/90 rounded-full flex items-center justify-center hover:bg-white"
+                  >
+                    <Bookmark className={`h-4 w-4 ${isSaved(b.id) ? "fill-[color:var(--rose)] text-[color:var(--rose)]" : ""}`} />
                   </button>
                 </div>
                 <div className="p-6">

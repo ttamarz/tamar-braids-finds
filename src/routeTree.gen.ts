@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SavedRouteImport } from './routes/saved'
+import { Route as RequestStylistRouteImport } from './routes/request-stylist'
 import { Route as ForStylistsRouteImport } from './routes/for-stylists'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -18,6 +20,16 @@ import { Route as CityCitySlugRouteImport } from './routes/city.$citySlug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthenticatedAdminStylistsRouteImport } from './routes/_authenticated/admin.stylists'
 
+const SavedRoute = SavedRouteImport.update({
+  id: '/saved',
+  path: '/saved',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RequestStylistRoute = RequestStylistRouteImport.update({
+  id: '/request-stylist',
+  path: '/request-stylist',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ForStylistsRoute = ForStylistsRouteImport.update({
   id: '/for-stylists',
   path: '/for-stylists',
@@ -63,6 +75,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/for-stylists': typeof ForStylistsRoute
+  '/request-stylist': typeof RequestStylistRoute
+  '/saved': typeof SavedRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/city/$citySlug': typeof CityCitySlugRoute
   '/blog/': typeof BlogIndexRoute
@@ -72,6 +86,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/for-stylists': typeof ForStylistsRoute
+  '/request-stylist': typeof RequestStylistRoute
+  '/saved': typeof SavedRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/city/$citySlug': typeof CityCitySlugRoute
   '/blog': typeof BlogIndexRoute
@@ -83,6 +99,8 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/for-stylists': typeof ForStylistsRoute
+  '/request-stylist': typeof RequestStylistRoute
+  '/saved': typeof SavedRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/city/$citySlug': typeof CityCitySlugRoute
   '/blog/': typeof BlogIndexRoute
@@ -94,6 +112,8 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/for-stylists'
+    | '/request-stylist'
+    | '/saved'
     | '/blog/$slug'
     | '/city/$citySlug'
     | '/blog/'
@@ -103,6 +123,8 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/for-stylists'
+    | '/request-stylist'
+    | '/saved'
     | '/blog/$slug'
     | '/city/$citySlug'
     | '/blog'
@@ -113,6 +135,8 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/for-stylists'
+    | '/request-stylist'
+    | '/saved'
     | '/blog/$slug'
     | '/city/$citySlug'
     | '/blog/'
@@ -124,6 +148,8 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ForStylistsRoute: typeof ForStylistsRoute
+  RequestStylistRoute: typeof RequestStylistRoute
+  SavedRoute: typeof SavedRoute
   BlogSlugRoute: typeof BlogSlugRoute
   CityCitySlugRoute: typeof CityCitySlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
@@ -131,6 +157,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/saved': {
+      id: '/saved'
+      path: '/saved'
+      fullPath: '/saved'
+      preLoaderRoute: typeof SavedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/request-stylist': {
+      id: '/request-stylist'
+      path: '/request-stylist'
+      fullPath: '/request-stylist'
+      preLoaderRoute: typeof RequestStylistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/for-stylists': {
       id: '/for-stylists'
       path: '/for-stylists'
@@ -206,6 +246,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ForStylistsRoute: ForStylistsRoute,
+  RequestStylistRoute: RequestStylistRoute,
+  SavedRoute: SavedRoute,
   BlogSlugRoute: BlogSlugRoute,
   CityCitySlugRoute: CityCitySlugRoute,
   BlogIndexRoute: BlogIndexRoute,

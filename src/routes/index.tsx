@@ -2,8 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { cities, styleCategories } from "@/data/cities";
-import { blogPosts } from "@/data/blog";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
+import { useSavedStylists } from "@/hooks/useSavedStylists";
 import { stylistsQueryOptions } from "@/lib/stylistsQuery";
 import type { Stylist } from "@/lib/stylists.functions";
 import { Search, MapPin, Star, Bookmark, Shield, Camera, Heart, ArrowRight, Sparkles } from "lucide-react";
@@ -54,6 +54,7 @@ function citySlugFor(name: string): string {
 
 function Home() {
   const { data: stylists } = useSuspenseQuery(stylistsQueryOptions);
+  const { isSaved, toggle } = useSavedStylists();
   const [query, setQuery] = useState("");
 
   const trimmed = query.trim().toLowerCase();
@@ -219,9 +220,20 @@ function Home() {
                       <Star className="h-3 w-3 fill-[color:var(--pink)] text-[color:var(--pink)]" />
                       {Number(s.rating).toFixed(1)}
                     </span>
-                    <span className="absolute top-2 right-2 h-7 w-7 bg-white/90 rounded-full flex items-center justify-center">
-                      <Bookmark className="h-3.5 w-3.5" />
-                    </span>
+                    <button
+                      type="button"
+                      aria-label={isSaved(s.id) ? "Remove from saved" : "Save stylist"}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggle(s.id);
+                      }}
+                      className="absolute top-2 right-2 h-7 w-7 bg-white/90 rounded-full flex items-center justify-center hover:bg-white"
+                    >
+                      <Bookmark
+                        className={`h-3.5 w-3.5 ${isSaved(s.id) ? "fill-[color:var(--rose)] text-[color:var(--rose)]" : ""}`}
+                      />
+                    </button>
                   </div>
                   <div className="mt-3 flex items-start justify-between gap-2">
                     <div className="min-w-0">
@@ -300,33 +312,28 @@ function Home() {
         </div>
       </section>
 
-      <section id="blog" className="mx-auto max-w-7xl px-4 sm:px-6 mt-16">
-        <div className="flex items-end justify-between mb-6">
-          <h2 className="uppercase tracking-[0.15em] text-sm font-semibold">Latest from the blog</h2>
-          <Link to="/blog" className="text-sm font-medium inline-flex items-center gap-1 hover:text-[color:var(--rose)]">
-            View all <ArrowRight className="h-4 w-4" />
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 mt-16">
+        <div className="rounded-[1.5rem] bg-card border border-border/60 p-6 sm:p-10 grid lg:grid-cols-[1fr_auto] gap-6 items-center">
+          <div>
+            <p className="font-[family-name:var(--font-script)] text-3xl sm:text-4xl text-[color:var(--rose)]">
+              Can't find a stylist?
+            </p>
+            <h2 className="font-display text-3xl sm:text-4xl mt-1 leading-tight">
+              We helpen je <em className="italic">verder.</em>
+            </h2>
+            <p className="mt-3 text-sm sm:text-base text-foreground/75 max-w-xl">
+              Tell us what you're looking for and we'll help you find a trusted braider near you.
+            </p>
+          </div>
+          <Link
+            to="/request-stylist"
+            className="inline-flex items-center justify-center gap-2 bg-foreground text-background text-sm font-semibold rounded-full px-6 py-3.5 hover:opacity-90 transition-opacity whitespace-nowrap"
+          >
+            Request a Stylist <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
-        <div className="grid sm:grid-cols-3 gap-6">
-          {blogPosts.map((p) => (
-            <Link
-              key={p.slug}
-              to="/blog/$slug"
-              params={{ slug: p.slug }}
-              className="group flex gap-4 items-center"
-            >
-              <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-2xl overflow-hidden shrink-0">
-                <img src={p.image} alt="" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
-              </div>
-              <div>
-                <span className="inline-block text-[10px] uppercase tracking-[0.18em] font-semibold bg-[color:var(--blush)] px-2 py-1 rounded-full">{p.tag}</span>
-                <h3 className="font-display text-lg leading-tight mt-2 group-hover:text-[color:var(--rose)] transition-colors">{p.title}</h3>
-                <p className="text-xs text-muted-foreground mt-1">{p.readTime}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
       </section>
+
 
       <SiteFooter />
     </div>
