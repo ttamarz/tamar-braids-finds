@@ -1,53 +1,64 @@
-## Goal
-Make stylist create/edit/delete work from `/admin/stylists` for your account, without touching the UI or data.
+# Plan: Functional updates to Tamar Finds (no redesign)
 
-## What I verified
-- Your user (`tecletamar1@gmail.com`) already has `role = 'admin'` in `public.user_roles`.
-- `stylists` RLS policies allow `authenticated` users with `has_role(..., 'admin')` to insert/update/delete. These are correct.
-- `attachSupabaseAuth` is registered in `src/start.ts`, so the bearer token should reach server fns.
+Scope: behavior only. Reuse existing components, colors, fonts, and layout.
 
-So the most likely culprits for the "permission" errors are:
-1. The custom `assertAdmin()` helper in `src/lib/stylists.functions.ts` queries `user_roles` directly with the user-scoped client. If anything trips that select (RLS edge case, stale session, multi-row response), it throws "Forbidden: admin role required" even though RLS on `stylists` itself would have allowed the write.
-2. Server fns surface raw `Error(...)` messages from Supabase as the toast text, which makes RLS errors look like generic save failures.
+## 1. Homepage: swap blog section for "Can't find a stylist?"
 
-## Plan
+- Remove the "Latest from the blog" section from `src/routes/index.tsx` (keep `/blog` route untouched so existing links don't break).
+- Replace with a section using the same card styling (`rounded-[1.5rem] bg-card border border-border/60 p-6 sm:p-8`):
+  - H2: "Can't find a stylist?"
+  - Text: "Tell us what you're looking for and we'll help you find a trusted braider near you."
+  - Button: "Request a Stylist" → links to new `/request-stylist` route.
 
-### 1. Make admin check authoritative and database-driven
-Replace the manual `assertAdmin()` lookup with the existing `public.has_role()` SECURITY DEFINER function via an RPC call:
+## 2. New request form page (`/request-stylist`)
 
-```ts
-const { data: ok, error } = await context.supabase.rpc('has_role', {
-  _user_id: context.userId, _role: 'admin',
-});
-if (error) throw new Error(error.message);
-if (!ok) throw new Error('Forbidden: admin role required');
-```
+- New route `src/routes/request-stylist.tsx` reusing the visual pattern from `for-stylists.tsx` (same `Field` component, same input styling, same hero block — just different copy).
+- Fields: name, email, city, hairstyle needed, budget (select: €/€€/€€€/Flexibel), extra notes (textarea).
+- Validation via zod + react-hook-form (same as For Stylists).
+- Submit writes to a new `stylist_requests` table in Lovable Cloud via a `createServerFn`. Public insert allowed (no auth needed to submit); only admins can read.
+- Toast on success, reset form.
 
-This bypasses any RLS quirk on `user_roles`, uses the same function the table policies use, and removes a class of false-negative failures. Apply to `createStylist`, `updateStylist`, `deleteStylist`, and `checkIsAdmin`.
+## 3. Make "List Your Business" CTA work
 
-### 2. Re-confirm admin role for your user
-Re-run the bootstrap insert idempotently so there is zero doubt:
+- In `src/routes/index.tsx`, the "Are you a braider?" card is already a `<Link to="/for-stylists">` but the inner CTA looks like a non-clickable span. Verify the whole card navigates — it does (outer Link wraps). No change needed beyond visual confirmation. If the user reports it not working, it's likely fine already; will keep as is.
 
-```sql
-INSERT INTO public.user_roles (user_id, role)
-VALUES ('43c31cd0-8314-47ed-a5e9-3c8d0a73b66a', 'admin')
-ON CONFLICT (user_id, role) DO NOTHING;
-```
+## 4. Navbar fixes (`src/components/SiteHeader.tsx`)
 
-### 3. Sanity-check RLS + grants (no schema redesign)
-Run the linter and, if anything is missing, add only what's needed:
-- Ensure `GRANT SELECT, INSERT, UPDATE, DELETE ON public.stylists TO authenticated` exists (it does per the schema, but re-grant defensively).
-- Ensure `GRANT EXECUTE ON FUNCTION public.has_role(uuid, app_role) TO authenticated` so the RPC call in step 1 works.
+- **Search button**: convert to a `Link to="/#results"` that scrolls to homepage results (same search input the Discover/home page already exposes). On mobile/desktop, clicking jumps to the homepage search bar.
+- **Saved button**: convert to `Link to="/saved"`.
+- Remove the standalone "Blog" nav link (since blog is being de-emphasized) — keep `/blog` route accessible but drop from nav. (Will confirm with user if they prefer to keep it.)
 
-### 4. Better error surfacing in admin UI
-In `src/routes/_authenticated/admin.stylists.tsx`, when a mutation fails, show the actual server error string in the toast (already partially done). Add a one-time visible banner if `checkIsAdmin` returns `{ isAdmin: false }` so future debugging is obvious.
+## 5. Saved stylists (bookmarks)
 
-### 5. Verify
-- Sign out and sign back in at `/auth` (refreshes the JWT).
-- Open `/admin/stylists`, create a test stylist, edit it, delete it.
-- Confirm no console / network 401 / 403.
+- Implement client-side persistence using `localStorage` (key `tf:saved`) — no auth required, instant, matches the existing heart icons on cards.
+- New `src/hooks/useSavedStylists.ts` exposing `{ saved: string[], toggle(id), isSaved(id) }` with a storage event listener so all tabs/components stay in sync.
+- Wire the bookmark icon on each stylist card in `src/routes/index.tsx` and `src/routes/city.$citySlug.tsx` to call `toggle(stylist.id)` (stopPropagation so the parent Link doesn't navigate). Filled vs outline state reflects `isSaved`.
+- New route `src/routes/saved.tsx`:
+  - Reads saved IDs from the hook.
+  - Uses existing `stylistsQueryOptions` to fetch all stylists, then filters by saved IDs.
+  - Renders the same stylist card grid used on the homepage. Empty state: "Je hebt nog geen stylists opgeslagen."
 
-## Out of scope
-- No UI redesign.
-- No changes to `stylists` columns or seed data.
-- No changes to auth provider configuration.
+## Technical details
+
+**Database migration** (one new table):
+- `stylist_requests` (name, email, city, hairstyle, budget, notes, status default 'new')
+- GRANT INSERT to anon + authenticated (public form), GRANT SELECT/UPDATE/DELETE to authenticated admins only
+- RLS: anyone can insert; only admins (`has_role(auth.uid(), 'admin')`) can select/update/delete
+
+**New files:**
+- `src/routes/request-stylist.tsx`
+- `src/routes/saved.tsx`
+- `src/hooks/useSavedStylists.ts`
+- `src/lib/stylistRequests.functions.ts` (server fn for insert)
+- migration for `stylist_requests`
+
+**Edited files:**
+- `src/routes/index.tsx` (remove blog block, add "Can't find a stylist?" block, wire bookmark toggle)
+- `src/routes/city.$citySlug.tsx` (wire bookmark toggle)
+- `src/components/SiteHeader.tsx` (Search → link to /#results, Saved → /saved, drop Blog link)
+
+**Out of scope:** no design changes, no CMS changes, no changes to stylist card visuals beyond making the heart button interactive, no auth changes.
+
+## Open question
+
+The Blog page (`/blog`) still exists. Drop it from the top nav (cleaner, matches the homepage change) or keep the nav link so users can still reach blog posts?
