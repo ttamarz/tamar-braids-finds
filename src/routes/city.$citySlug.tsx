@@ -41,6 +41,7 @@ export const Route = createFileRoute("/city/$citySlug")({
 function CityPage() {
   const { city } = Route.useLoaderData();
   const { data: all } = useSuspenseQuery(stylistsQueryOptions);
+  const { isSaved, toggle } = useSavedStylists();
   const stylists = all.filter(
     (s: Stylist) => s.city.toLowerCase() === city.name.toLowerCase()
   );
