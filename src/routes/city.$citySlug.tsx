@@ -4,6 +4,7 @@ import { getCity } from "@/data/cities";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
 import { stylistsQueryOptions } from "@/lib/stylistsQuery";
 import type { Stylist } from "@/lib/stylists.functions";
+import { useSavedStylists } from "@/hooks/useSavedStylists";
 import { Instagram, ArrowLeft, Star, Bookmark, MapPin } from "lucide-react";
 
 const fallbackImage =
