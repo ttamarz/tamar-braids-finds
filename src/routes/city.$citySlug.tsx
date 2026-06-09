@@ -90,8 +90,13 @@ function CityPage() {
                     <Star className="h-3 w-3 fill-[color:var(--pink)] text-[color:var(--pink)]" />
                     {Number(b.rating).toFixed(1)}
                   </span>
-                  <button aria-label="Save" className="absolute top-3 right-3 h-8 w-8 bg-white/90 rounded-full flex items-center justify-center hover:bg-white">
-                    <Bookmark className="h-4 w-4" />
+                  <button
+                    type="button"
+                    aria-label={isSaved(b.id) ? "Remove from saved" : "Save stylist"}
+                    onClick={() => toggle(b.id)}
+                    className="absolute top-3 right-3 h-8 w-8 bg-white/90 rounded-full flex items-center justify-center hover:bg-white"
+                  >
+                    <Bookmark className={`h-4 w-4 ${isSaved(b.id) ? "fill-[color:var(--rose)] text-[color:var(--rose)]" : ""}`} />
                   </button>
                 </div>
                 <div className="p-6">
