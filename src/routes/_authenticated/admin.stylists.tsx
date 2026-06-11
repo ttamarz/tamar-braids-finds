@@ -270,7 +270,7 @@ function AdminStylists() {
                   ))}
                   {stylists.length === 0 && (
                     <tr>
-                      <td colSpan={5} className="px-4 py-10 text-center text-muted-foreground">
+                      <td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
                         Nog geen stylists. Klik op "Stylist toevoegen".
                       </td>
                     </tr>
