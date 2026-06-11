@@ -220,6 +220,16 @@ function Home() {
                       <Star className="h-3 w-3 fill-[color:var(--pink)] text-[color:var(--pink)]" />
                       {Number(s.rating).toFixed(1)}
                     </span>
+                    {s.featured && (
+                      <span className="absolute bottom-2 left-2 bg-[color:var(--rose)] text-white text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                        Featured
+                      </span>
+                    )}
+                    {!s.verified && (
+                      <span className="absolute bottom-2 right-2 bg-amber-100 text-amber-900 text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                        Unverified
+                      </span>
+                    )}
                     <button
                       type="button"
                       aria-label={isSaved(s.id) ? "Remove from saved" : "Save stylist"}
