@@ -135,7 +135,7 @@ export const setStylistFlags = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
-    const patch: Record<string, boolean> = {};
+    const patch: { verified?: boolean; featured?: boolean } = {};
     if (typeof data.verified === "boolean") patch.verified = data.verified;
     if (typeof data.featured === "boolean") patch.featured = data.featured;
     const { data: row, error } = await context.supabase
