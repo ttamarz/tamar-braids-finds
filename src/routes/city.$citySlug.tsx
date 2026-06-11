@@ -90,6 +90,16 @@ function CityPage() {
                     <Star className="h-3 w-3 fill-[color:var(--pink)] text-[color:var(--pink)]" />
                     {Number(b.rating).toFixed(1)}
                   </span>
+                  {b.featured && (
+                    <span className="absolute bottom-3 left-3 bg-[color:var(--rose)] text-white text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                      Featured
+                    </span>
+                  )}
+                  {!b.verified && (
+                    <span className="absolute bottom-3 right-3 bg-amber-100 text-amber-900 text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                      Unverified
+                    </span>
+                  )}
                   <button
                     type="button"
                     aria-label={isSaved(b.id) ? "Remove from saved" : "Save stylist"}
