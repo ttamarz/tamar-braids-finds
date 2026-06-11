@@ -200,8 +200,9 @@ function AdminStylists() {
                   <tr>
                     <th className="px-4 py-3 font-semibold">Stylist</th>
                     <th className="px-4 py-3 font-semibold">Stad</th>
-                    <th className="px-4 py-3 font-semibold">Rating</th>
                     <th className="px-4 py-3 font-semibold">Prijs</th>
+                    <th className="px-4 py-3 font-semibold">Verified</th>
+                    <th className="px-4 py-3 font-semibold">Featured</th>
                     <th className="px-4 py-3"></th>
                   </tr>
                 </thead>
@@ -215,15 +216,39 @@ function AdminStylists() {
                           ) : (
                             <div className="h-10 w-10 rounded-full bg-muted" />
                           )}
-                          <span className="font-medium">{s.name}</span>
+                          <div>
+                            <div className="font-medium">{s.name}</div>
+                            {s.email && <div className="text-xs text-muted-foreground">{s.email}</div>}
+                          </div>
                         </div>
                       </td>
                       <td className="px-4 py-3">{s.city}</td>
                       <td className="px-4 py-3">
-                        {Number(s.rating).toFixed(1)} ({s.reviews_count})
+                        €{s.price_min}–{s.price_max}
                       </td>
                       <td className="px-4 py-3">
-                        €{s.price_min}–{s.price_max}
+                        <button
+                          onClick={() => setFlags.mutate({ id: s.id, verified: !s.verified })}
+                          className={`text-xs px-3 py-1 rounded-full font-semibold ${
+                            s.verified
+                              ? "bg-emerald-100 text-emerald-800"
+                              : "bg-amber-100 text-amber-800"
+                          }`}
+                        >
+                          {s.verified ? "Verified" : "Unverified"}
+                        </button>
+                      </td>
+                      <td className="px-4 py-3">
+                        <button
+                          onClick={() => setFlags.mutate({ id: s.id, featured: !s.featured })}
+                          className={`text-xs px-3 py-1 rounded-full font-semibold ${
+                            s.featured
+                              ? "bg-[color:var(--rose)] text-white"
+                              : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          {s.featured ? "Featured" : "—"}
+                        </button>
                       </td>
                       <td className="px-4 py-3 text-right">
                         <button
