@@ -7,6 +7,7 @@ import {
   updateStylist,
   deleteStylist,
   checkIsAdmin,
+  setStylistFlags,
   type Stylist,
 } from "@/lib/stylists.functions";
 import { stylistsQueryOptions } from "@/lib/stylistsQuery";
