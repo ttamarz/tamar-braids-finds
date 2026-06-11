@@ -18,6 +18,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as CityCitySlugRouteImport } from './routes/city.$citySlug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as AuthenticatedMyListingRouteImport } from './routes/_authenticated/my-listing'
 import { Route as AuthenticatedAdminStylistsRouteImport } from './routes/_authenticated/admin.stylists'
 
 const SavedRoute = SavedRouteImport.update({
@@ -64,6 +65,11 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedMyListingRoute = AuthenticatedMyListingRouteImport.update({
+  id: '/my-listing',
+  path: '/my-listing',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminStylistsRoute =
   AuthenticatedAdminStylistsRouteImport.update({
     id: '/admin/stylists',
@@ -77,6 +83,7 @@ export interface FileRoutesByFullPath {
   '/for-stylists': typeof ForStylistsRoute
   '/request-stylist': typeof RequestStylistRoute
   '/saved': typeof SavedRoute
+  '/my-listing': typeof AuthenticatedMyListingRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/city/$citySlug': typeof CityCitySlugRoute
   '/blog/': typeof BlogIndexRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByTo {
   '/for-stylists': typeof ForStylistsRoute
   '/request-stylist': typeof RequestStylistRoute
   '/saved': typeof SavedRoute
+  '/my-listing': typeof AuthenticatedMyListingRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/city/$citySlug': typeof CityCitySlugRoute
   '/blog': typeof BlogIndexRoute
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   '/for-stylists': typeof ForStylistsRoute
   '/request-stylist': typeof RequestStylistRoute
   '/saved': typeof SavedRoute
+  '/_authenticated/my-listing': typeof AuthenticatedMyListingRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/city/$citySlug': typeof CityCitySlugRoute
   '/blog/': typeof BlogIndexRoute
@@ -114,6 +123,7 @@ export interface FileRouteTypes {
     | '/for-stylists'
     | '/request-stylist'
     | '/saved'
+    | '/my-listing'
     | '/blog/$slug'
     | '/city/$citySlug'
     | '/blog/'
@@ -125,6 +135,7 @@ export interface FileRouteTypes {
     | '/for-stylists'
     | '/request-stylist'
     | '/saved'
+    | '/my-listing'
     | '/blog/$slug'
     | '/city/$citySlug'
     | '/blog'
@@ -137,6 +148,7 @@ export interface FileRouteTypes {
     | '/for-stylists'
     | '/request-stylist'
     | '/saved'
+    | '/_authenticated/my-listing'
     | '/blog/$slug'
     | '/city/$citySlug'
     | '/blog/'
@@ -220,6 +232,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/my-listing': {
+      id: '/_authenticated/my-listing'
+      path: '/my-listing'
+      fullPath: '/my-listing'
+      preLoaderRoute: typeof AuthenticatedMyListingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/stylists': {
       id: '/_authenticated/admin/stylists'
       path: '/admin/stylists'
@@ -231,10 +250,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedMyListingRoute: typeof AuthenticatedMyListingRoute
   AuthenticatedAdminStylistsRoute: typeof AuthenticatedAdminStylistsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedMyListingRoute: AuthenticatedMyListingRoute,
   AuthenticatedAdminStylistsRoute: AuthenticatedAdminStylistsRoute,
 }
 
@@ -255,3 +276,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
