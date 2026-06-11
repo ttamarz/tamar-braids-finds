@@ -95,6 +95,14 @@ function AdminStylists() {
   const createFn = useServerFn(createStylist);
   const updateFn = useServerFn(updateStylist);
   const deleteFn = useServerFn(deleteStylist);
+  const flagsFn = useServerFn(setStylistFlags);
+
+  const setFlags = useMutation({
+    mutationFn: (vars: { id: string; verified?: boolean; featured?: boolean }) =>
+      flagsFn({ data: vars }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["stylists"] }),
+    onError: (err) => toast.error(err instanceof Error ? err.message : "Update mislukt"),
+  });
 
   const [editing, setEditing] = useState<Stylist | null>(null);
   const [creating, setCreating] = useState(false);
