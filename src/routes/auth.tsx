@@ -1,27 +1,48 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
 import { toast } from "sonner";
 
+const searchSchema = z.object({
+  next: z.string().optional(),
+});
+
 export const Route = createFileRoute("/auth")({
   ssr: false,
+  validateSearch: searchSchema,
   component: AuthPage,
   head: () => ({ meta: [{ title: "Inloggen — Tamar Finds" }] }),
 });
 
+async function resolveDestination(explicit?: string): Promise<string> {
+  if (explicit && explicit.startsWith("/")) return explicit;
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData.user) return "/";
+  const { data: isAdmin } = await supabase.rpc("has_role", {
+    _user_id: userData.user.id,
+    _role: "admin",
+  });
+  return isAdmin ? "/admin/stylists" : "/my-listing";
+}
+
 function AuthPage() {
   const navigate = useNavigate();
+  const { next } = Route.useSearch();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) navigate({ to: "/admin/stylists" });
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (data.user) {
+        const to = await resolveDestination(next);
+        navigate({ to });
+      }
     });
-  }, [navigate]);
+  }, [navigate, next]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -31,16 +52,17 @@ function AuthPage() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin + "/admin/stylists" },
+          options: { emailRedirectTo: window.location.origin + (next || "/my-listing") },
         });
         if (error) throw error;
-        toast.success("Account aangemaakt. Je bent ingelogd.");
+        toast.success("Account aangemaakt.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Welkom terug!");
       }
-      navigate({ to: "/admin/stylists" });
+      const to = await resolveDestination(next);
+      navigate({ to });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Er ging iets mis");
     } finally {
@@ -55,7 +77,7 @@ function AuthPage() {
         <div className="rounded-[1.5rem] bg-card border border-border/60 p-8">
           <h1 className="font-display text-3xl">{mode === "signin" ? "Inloggen" : "Account aanmaken"}</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Admin-toegang om vlechters toe te voegen of te bewerken.
+            Log in om je eigen stylist-listing te beheren of toegang te krijgen tot het admin-paneel.
           </p>
 
           <form onSubmit={onSubmit} className="mt-6 space-y-4">

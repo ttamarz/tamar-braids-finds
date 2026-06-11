@@ -56,48 +56,63 @@ export type Database = {
       stylists: {
         Row: {
           bio: string | null
+          booking_url: string | null
           city: string
           created_at: string
+          email: string | null
+          featured: boolean
           id: string
           image_url: string | null
           instagram_url: string | null
           name: string
+          owner_id: string | null
           price_max: number
           price_min: number
           rating: number
           reviews_count: number
           specialties: string[]
           updated_at: string
+          verified: boolean
         }
         Insert: {
           bio?: string | null
+          booking_url?: string | null
           city: string
           created_at?: string
+          email?: string | null
+          featured?: boolean
           id?: string
           image_url?: string | null
           instagram_url?: string | null
           name: string
+          owner_id?: string | null
           price_max?: number
           price_min?: number
           rating?: number
           reviews_count?: number
           specialties?: string[]
           updated_at?: string
+          verified?: boolean
         }
         Update: {
           bio?: string | null
+          booking_url?: string | null
           city?: string
           created_at?: string
+          email?: string | null
+          featured?: boolean
           id?: string
           image_url?: string | null
           instagram_url?: string | null
           name?: string
+          owner_id?: string | null
           price_max?: number
           price_min?: number
           rating?: number
           reviews_count?: number
           specialties?: string[]
           updated_at?: string
+          verified?: boolean
         }
         Relationships: []
       }
