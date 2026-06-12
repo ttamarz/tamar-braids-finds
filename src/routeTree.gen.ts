@@ -15,9 +15,7 @@ import { Route as ForStylistsRouteImport } from './routes/for-stylists'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as CityCitySlugRouteImport } from './routes/city.$citySlug'
-import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthenticatedMyListingRouteImport } from './routes/_authenticated/my-listing'
 import { Route as AuthenticatedAdminStylistsRouteImport } from './routes/_authenticated/admin.stylists'
 
@@ -50,19 +48,9 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BlogIndexRoute = BlogIndexRouteImport.update({
-  id: '/blog/',
-  path: '/blog/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CityCitySlugRoute = CityCitySlugRouteImport.update({
   id: '/city/$citySlug',
   path: '/city/$citySlug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BlogSlugRoute = BlogSlugRouteImport.update({
-  id: '/blog/$slug',
-  path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedMyListingRoute = AuthenticatedMyListingRouteImport.update({
@@ -84,9 +72,7 @@ export interface FileRoutesByFullPath {
   '/request-stylist': typeof RequestStylistRoute
   '/saved': typeof SavedRoute
   '/my-listing': typeof AuthenticatedMyListingRoute
-  '/blog/$slug': typeof BlogSlugRoute
   '/city/$citySlug': typeof CityCitySlugRoute
-  '/blog/': typeof BlogIndexRoute
   '/admin/stylists': typeof AuthenticatedAdminStylistsRoute
 }
 export interface FileRoutesByTo {
@@ -96,9 +82,7 @@ export interface FileRoutesByTo {
   '/request-stylist': typeof RequestStylistRoute
   '/saved': typeof SavedRoute
   '/my-listing': typeof AuthenticatedMyListingRoute
-  '/blog/$slug': typeof BlogSlugRoute
   '/city/$citySlug': typeof CityCitySlugRoute
-  '/blog': typeof BlogIndexRoute
   '/admin/stylists': typeof AuthenticatedAdminStylistsRoute
 }
 export interface FileRoutesById {
@@ -110,9 +94,7 @@ export interface FileRoutesById {
   '/request-stylist': typeof RequestStylistRoute
   '/saved': typeof SavedRoute
   '/_authenticated/my-listing': typeof AuthenticatedMyListingRoute
-  '/blog/$slug': typeof BlogSlugRoute
   '/city/$citySlug': typeof CityCitySlugRoute
-  '/blog/': typeof BlogIndexRoute
   '/_authenticated/admin/stylists': typeof AuthenticatedAdminStylistsRoute
 }
 export interface FileRouteTypes {
@@ -124,9 +106,7 @@ export interface FileRouteTypes {
     | '/request-stylist'
     | '/saved'
     | '/my-listing'
-    | '/blog/$slug'
     | '/city/$citySlug'
-    | '/blog/'
     | '/admin/stylists'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -136,9 +116,7 @@ export interface FileRouteTypes {
     | '/request-stylist'
     | '/saved'
     | '/my-listing'
-    | '/blog/$slug'
     | '/city/$citySlug'
-    | '/blog'
     | '/admin/stylists'
   id:
     | '__root__'
@@ -149,9 +127,7 @@ export interface FileRouteTypes {
     | '/request-stylist'
     | '/saved'
     | '/_authenticated/my-listing'
-    | '/blog/$slug'
     | '/city/$citySlug'
-    | '/blog/'
     | '/_authenticated/admin/stylists'
   fileRoutesById: FileRoutesById
 }
@@ -162,9 +138,7 @@ export interface RootRouteChildren {
   ForStylistsRoute: typeof ForStylistsRoute
   RequestStylistRoute: typeof RequestStylistRoute
   SavedRoute: typeof SavedRoute
-  BlogSlugRoute: typeof BlogSlugRoute
   CityCitySlugRoute: typeof CityCitySlugRoute
-  BlogIndexRoute: typeof BlogIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -211,25 +185,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/blog/': {
-      id: '/blog/'
-      path: '/blog'
-      fullPath: '/blog/'
-      preLoaderRoute: typeof BlogIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/city/$citySlug': {
       id: '/city/$citySlug'
       path: '/city/$citySlug'
       fullPath: '/city/$citySlug'
       preLoaderRoute: typeof CityCitySlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/blog/$slug': {
-      id: '/blog/$slug'
-      path: '/blog/$slug'
-      fullPath: '/blog/$slug'
-      preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/my-listing': {
@@ -269,10 +229,18 @@ const rootRouteChildren: RootRouteChildren = {
   ForStylistsRoute: ForStylistsRoute,
   RequestStylistRoute: RequestStylistRoute,
   SavedRoute: SavedRoute,
-  BlogSlugRoute: BlogSlugRoute,
   CityCitySlugRoute: CityCitySlugRoute,
-  BlogIndexRoute: BlogIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
