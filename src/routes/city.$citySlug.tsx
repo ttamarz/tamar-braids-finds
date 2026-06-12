@@ -52,7 +52,8 @@ function CityPage() {
   const displayName =
     preset?.name ??
     stylists[0]?.city ??
-    slug.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+    slug.split("-").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+
   const tagline = preset?.tagline ?? "Ontdek vertrouwde vlechters in jouw stad.";
 
   return (
