@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getCity } from "@/data/cities";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
@@ -10,24 +10,28 @@ import { Instagram, ArrowLeft, Star, Bookmark, MapPin } from "lucide-react";
 const fallbackImage =
   "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=800&q=80";
 
+function slugify(name: string) {
+  return name.toLowerCase().trim().replace(/\s+/g, "-");
+}
+
 export const Route = createFileRoute("/city/$citySlug")({
   loader: async ({ params, context }) => {
-    const city = getCity(params.citySlug);
-    if (!city) throw notFound();
     await context.queryClient.ensureQueryData(stylistsQueryOptions);
-    return { city };
+    return { slug: params.citySlug };
   },
   head: ({ loaderData }) => {
-    const city = loaderData?.city;
-    const title = city ? `Vlechters in ${city.name} — Tamar Finds` : "Tamar Finds";
-    const description = city ? `Ontdek handgekozen vlechters in ${city.name}.` : "";
+    const slug = loaderData?.slug ?? "";
+    const preset = getCity(slug);
+    const name = preset?.name ?? slug.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+    const title = `Vlechters in ${name} — Tamar Finds`;
+    const description = `Ontdek handgekozen vlechters in ${name}.`;
     return {
       meta: [
         { title },
         { name: "description", content: description },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
-        ...(city ? [{ property: "og:image", content: city.cover }] : []),
+        ...(preset ? [{ property: "og:image", content: preset.cover }] : []),
       ],
     };
   },
@@ -39,12 +43,17 @@ export const Route = createFileRoute("/city/$citySlug")({
 });
 
 function CityPage() {
-  const { city } = Route.useLoaderData();
+  const { slug } = Route.useLoaderData();
   const { data: all } = useSuspenseQuery(stylistsQueryOptions);
   const { isSaved, toggle } = useSavedStylists();
-  const stylists = all.filter(
-    (s: Stylist) => s.city.toLowerCase() === city.name.toLowerCase()
-  );
+
+  const preset = getCity(slug);
+  const stylists = all.filter((s: Stylist) => slugify(s.city) === slug);
+  const displayName =
+    preset?.name ??
+    stylists[0]?.city ??
+    slug.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+  const tagline = preset?.tagline ?? "Ontdek vertrouwde vlechters in jouw stad.";
 
   return (
     <div className="min-h-screen">
@@ -52,17 +61,23 @@ function CityPage() {
 
       <section className="mx-auto max-w-7xl px-4 sm:px-6 pt-6">
         <div className="relative overflow-hidden rounded-[2rem] min-h-[340px] sm:min-h-[420px] flex items-end">
-          <img src={city.cover} alt={city.name} className="absolute inset-0 h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
-          <div className="relative p-6 sm:p-10 text-white w-full">
-            <Link to="/" className="inline-flex items-center gap-2 text-sm text-white/85 hover:text-white">
+          {preset ? (
+            <>
+              <img src={preset.cover} alt={displayName} className="absolute inset-0 h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
+            </>
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-[color:var(--blush)] via-[color:var(--blush)]/70 to-[color:var(--background)]" />
+          )}
+          <div className={`relative p-6 sm:p-10 w-full ${preset ? "text-white" : "text-foreground"}`}>
+            <Link to="/" className={`inline-flex items-center gap-2 text-sm ${preset ? "text-white/85 hover:text-white" : "text-foreground/70 hover:text-foreground"}`}>
               <ArrowLeft className="h-4 w-4" /> Alle steden
             </Link>
-            <h1 className="font-display text-5xl sm:text-7xl mt-6 text-white">{city.name}</h1>
-            <p className="mt-2 font-[family-name:var(--font-script)] text-2xl sm:text-3xl text-white/95 max-w-xl">
-              {city.tagline}
+            <h1 className={`font-display text-5xl sm:text-7xl mt-6 ${preset ? "text-white" : "text-foreground"}`}>{displayName}</h1>
+            <p className={`mt-2 font-[family-name:var(--font-script)] text-2xl sm:text-3xl max-w-xl ${preset ? "text-white/95" : "text-[color:var(--rose)]"}`}>
+              {tagline}
             </p>
-            <p className="mt-3 text-sm text-white/80">{stylists.length} vlechters</p>
+            <p className={`mt-3 text-sm ${preset ? "text-white/80" : "text-muted-foreground"}`}>{stylists.length} vlechters</p>
           </div>
         </div>
       </section>
@@ -70,7 +85,7 @@ function CityPage() {
       <section className="mx-auto max-w-7xl px-4 sm:px-6 mt-10">
         {stylists.length === 0 ? (
           <div className="py-20 text-center text-muted-foreground">
-            Nog geen vlechters in {city.name}. Kom snel terug!
+            Nog geen vlechters in {displayName}. Kom snel terug!
           </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
