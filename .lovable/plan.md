@@ -1,82 +1,60 @@
+## Launch readiness — Tamar Finds
 
-# Tamar Finds MVP — finish without redesigning
+Scope: stability, polish, no redesign. No new features.
 
-No visual changes to home, cards, CMS, fonts, or colors. All work is data, auth, and small functional additions reusing existing styles.
+### 1. Admin permissions
+- **Migration**:
+  - Drop the `bootstrap_first_admin` function (and any trigger that calls it) so new signups never auto-promote.
+  - Seed `public.user_roles` with an `admin` row for `tecletamar1@gmail.com` (lookup via `auth.users.email`, insert only if not exists, `ON CONFLICT DO NOTHING`).
+- No code change needed to `has_role`, RLS, or admin UI — they already key off `user_roles`.
+- Update the empty-state copy in `admin.stylists.tsx` from "first person to register becomes admin" to "Contact the site owner for admin access".
 
-## 1. Database migration
+### 2. Listing form (`/my-listing`)
+Required (add `required` to inputs + tighten Zod in `stylists.functions.ts`):
+- name, city, email, instagram_url, specialties (≥1), bio (≥10 chars)
 
-Single migration covering schema, grants, RLS, and security hardening.
+Optional (relax):
+- image_url, price_min, price_max, booking_url
 
-**`stylists` — add columns**
-- `owner_id uuid REFERENCES auth.users(id) ON DELETE SET NULL` (nullable so existing seeded rows stay)
-- `verified boolean NOT NULL DEFAULT false`
-- `featured boolean NOT NULL DEFAULT false` (used for "Sponsored/Featured")
-- `email text`, `booking_url text` (new submission fields)
-- Backfill: mark all existing seeded rows `verified = true` so current site looks unchanged.
+Zod changes in `stylistInput`:
+- `email`: required email
+- `instagram_url`: required URL
+- `bio`: required, min 10
+- `specialties`: min length 1
+- `price_min`/`price_max`: default 0, optional
+- Keep refine `price_max >= price_min`
 
-**`stylists` RLS — replace current admin-only writes**
-- `SELECT`: public (unchanged).
-- `INSERT (authenticated)`: `WITH CHECK (owner_id = auth.uid())` — stylists create their own row; force `verified=false, featured=false` via a `BEFORE INSERT` trigger that resets those two fields unless `has_role(auth.uid(),'admin')`.
-- `UPDATE (authenticated)`: `USING (owner_id = auth.uid()) WITH CHECK (owner_id = auth.uid())` for owners, **plus** a separate admin policy `USING/CHECK has_role(...)`. A `BEFORE UPDATE` trigger blocks non-admins from changing `verified`, `featured`, `owner_id`.
-- `DELETE`: admin-only.
+UI: mark required fields with `*` and `required`; remove `required` from price fields.
 
-**`stylist_requests` — already correct** (anon insert, admin read/update/delete). Keep.
+### 3. Cities — free-text
+- `my-listing.tsx`: city input already uses a `<datalist>` (free text allowed) — keep as is, just confirm.
+- `index.tsx` search already filters across `s.city` text, so newly added cities are searchable.
+- `citySlugFor` already falls back to `slugify(name)` so any city links work.
+- `city.$citySlug.tsx`: when `getCity(slug)` returns undefined, derive a display city from the stylists matching that slug (use first matching stylist's `city`) instead of 404, with a generic tagline. Filter stylist list by `slugify(s.city) === params.citySlug`.
 
-**`user_roles` — tighten**
-- Keep existing `SELECT` policy (`auth.uid() = user_id`).
-- No INSERT/UPDATE/DELETE policies (already denied). Role grants done via migration or service-role only.
+### 4. Navigation
+- `SiteHeader` "Search" already links to `/#results`. Update it to also focus the search input: scroll to `#results` and dispatch focus on `#discover-search` (add that id to the input in `index.tsx`).
+- Confirm `/saved` route loads saved stylists from localStorage (already implemented). No change unless bug found during smoke test.
 
-**SECURITY DEFINER hygiene**
-- `has_role(uuid, app_role)` — keep `EXECUTE` to `authenticated` only (needed by RLS as the calling role); REVOKE from `anon` and `public`. RLS evaluation works because it runs as the table owner regardless.
-- `bootstrap_first_admin()` — trigger function, REVOKE EXECUTE from `anon, authenticated, public`.
-- `update_updated_at_column()` — trigger function, REVOKE EXECUTE from `anon, authenticated, public`.
+### 5. Keep as-is
+- Verified/Featured admin toggles, ownership RLS, `setStylistFlags`, `_authenticated` gate, CMS structure, stylist cards, colors, fonts.
 
-**Triggers**
-- `stylists_force_unverified_on_insert` — set `verified=false, featured=false, owner_id=auth.uid()` when caller is not admin.
-- `stylists_block_privileged_updates` — if not admin, reset `verified/featured/owner_id` to OLD values.
-- `set_updated_at` on `stylists` and `stylist_requests`.
+### 6. Cleanup
+- Delete: `src/routes/blog.index.tsx`, `src/routes/blog.$slug.tsx`, `src/data/blog.ts`.
+- Remove any remaining links to `/blog` (none currently in SiteHeader, confirm in footer + index).
+- Keep `/request-stylist` (it's wired in from the homepage CTA).
+- Leave `Toaster` and existing pages alone otherwise.
 
-## 2. Server functions
+### Technical details
 
-`src/lib/stylists.functions.ts` — extend:
-- `listStylists` — order by `featured DESC, verified DESC, created_at DESC` (so featured/verified surface first; unverified still listed but lower). Add `verified`, `featured`, `owner_id`, `email`, `booking_url` to select + type.
-- `createStylist` — drop admin assertion; require auth (`requireSupabaseAuth`), set `owner_id = context.userId`. DB trigger enforces verified/featured=false.
-- `updateStylist` — drop admin assertion; rely on RLS + trigger. Two callers (owner editing self, admin editing anyone) both go through same function.
-- `deleteStylist` — keep admin assertion.
-- New `getMyStylist` — returns the caller's own listing (or null).
-- New admin-only `setStylistFlags({ id, verified?, featured? })` — uses `assertAdmin`.
+**Files edited/created**:
+- New migration: drop `bootstrap_first_admin`, drop any trigger calling it, insert admin row for tecletamar1@gmail.com.
+- `src/lib/stylists.functions.ts`: tighten Zod (email/instagram/bio required, prices optional).
+- `src/routes/_authenticated/my-listing.tsx`: update field `required` flags, add `*` to required labels.
+- `src/routes/_authenticated/admin.stylists.tsx`: update copy in empty admin state.
+- `src/routes/city.$citySlug.tsx`: support unknown cities by reading from stylist data.
+- `src/routes/index.tsx`: add `id="discover-search"` to the search input.
+- `src/components/SiteHeader.tsx`: keep `/#results` link; no logic change beyond confirming.
+- Delete: `src/routes/blog.index.tsx`, `src/routes/blog.$slug.tsx`, `src/data/blog.ts`.
 
-`src/lib/stylists.functions.ts` types extended with `verified`, `featured`, `owner_id`.
-
-## 3. Routes
-
-**`src/routes/_authenticated/my-listing.tsx`** (new) — stylist self-service form. Same field set as admin form minus rating/reviews. Uses `getMyStylist` + `createStylist`/`updateStylist`. Shows "Unverified — under review" banner when `verified=false`.
-
-**`src/routes/for-stylists.tsx`** — replace the demo client-only form submit with: if not logged in → "Maak een account aan" CTA to `/auth?next=/my-listing`; if logged in → redirect to `/my-listing`. Keeps page design, just rewires the submit/CTA.
-
-**`src/routes/auth.tsx`** — read `?next=` search param, redirect there after sign-in (fallback `/my-listing` for non-admins, `/admin/stylists` for admins via `checkIsAdmin`).
-
-**`src/routes/_authenticated/admin.stylists.tsx`** — add columns: Verified toggle, Featured toggle, owner email (small). Wire to `setStylistFlags`. No layout overhaul.
-
-**`src/routes/saved.tsx`** & cards in `index.tsx`/`city.$citySlug.tsx`** — already wired via `useSavedStylists`. Verify they work; add an "Unverified" pill on cards when `!s.verified` (small badge, same blush style as rating badge but neutral). Add subtle "Featured" pill when `s.featured`.
-
-**Search** — home search already filters by name/city/specialty/bio. Header search button already scrolls to `/#results`. No changes unless QA shows a bug.
-
-## 4. Sponsored/Featured surfacing
-
-On homepage, when not searching, show featured stylists first (already covered by new `listStylists` ordering). Add a tiny `Featured` label on those cards. No new section, no payments.
-
-## 5. Files touched
-
-- New: `supabase/migrations/<ts>_stylist_ownership_verification.sql`, `src/routes/_authenticated/my-listing.tsx`
-- Edited: `src/lib/stylists.functions.ts`, `src/routes/_authenticated/admin.stylists.tsx`, `src/routes/for-stylists.tsx`, `src/routes/auth.tsx`, `src/routes/index.tsx` (badges + featured ordering already from query), `src/routes/city.$citySlug.tsx` (badges), `src/integrations/supabase/types.ts` (regenerated post-migration)
-
-## 6. Out of scope (per request)
-
-- No hair profile feature.
-- No payments for sponsored.
-- No design/CMS/layout changes beyond small Verified/Featured badges and one new self-service form page reusing existing styles.
-
-## Open question
-
-For the first time a logged-in non-admin lands at `/my-listing` with no row yet — auto-create a draft row, or show an empty form and create on first save? I'll go with **empty form, create on first save** unless you'd rather have an auto-draft.
+**Open question**: For city pages with no preset cover image (e.g. Nijmegen), is it OK to show a neutral gradient header instead of a stock photo? Proposed: yes, reuse the existing blush gradient used elsewhere.

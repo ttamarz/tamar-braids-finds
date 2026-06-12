@@ -32,26 +32,21 @@ const optionalUrl = z
   .optional()
   .or(z.literal("").transform(() => undefined));
 
-const optionalEmail = z
-  .string()
-  .trim()
-  .max(200)
-  .email()
-  .optional()
-  .or(z.literal("").transform(() => undefined));
+const requiredUrl = z.string().trim().min(1, "Required").max(1000).url();
+const requiredEmail = z.string().trim().min(1, "Required").max(200).email();
 
 const stylistInput = z.object({
-  name: z.string().trim().min(1).max(120),
-  city: z.string().trim().min(1).max(80),
-  instagram_url: optionalUrl,
+  name: z.string().trim().min(1, "Name is required").max(120),
+  city: z.string().trim().min(1, "City is required").max(80),
+  instagram_url: requiredUrl,
   image_url: optionalUrl,
   rating: z.number().min(0).max(5),
   reviews_count: z.number().int().min(0).max(100000),
   price_min: z.number().int().min(0).max(100000),
   price_max: z.number().int().min(0).max(100000),
-  specialties: z.array(z.string().trim().min(1).max(60)).max(20),
-  bio: z.string().trim().max(2000).optional().or(z.literal("").transform(() => undefined)),
-  email: optionalEmail,
+  specialties: z.array(z.string().trim().min(1).max(60)).min(1, "Add at least one specialty").max(20),
+  bio: z.string().trim().min(10, "Bio must be at least 10 characters").max(2000),
+  email: requiredEmail,
   booking_url: optionalUrl,
 });
 
@@ -59,6 +54,7 @@ const stylistInputRefined = stylistInput.refine((d) => d.price_max >= d.price_mi
   path: ["price_max"],
   message: "Max price must be greater than or equal to min price",
 });
+
 
 export type StylistInput = z.infer<typeof stylistInputRefined>;
 

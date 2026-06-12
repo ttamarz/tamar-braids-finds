@@ -177,36 +177,42 @@ function MyListing() {
                 onChange={(v) => setForm({ ...form, city: v })}
                 required
                 list={cities.map((c) => c.name)}
+                placeholder="bv. Nijmegen"
                 cls={inputCls}
               />
-              <Field label="Instagram URL" value={form.instagram_url} onChange={(v) => setForm({ ...form, instagram_url: v })} placeholder="https://instagram.com/handle" cls={inputCls} />
-              <Field label="Foto / logo URL" value={form.image_url} onChange={(v) => setForm({ ...form, image_url: v })} placeholder="https://..." cls={inputCls} />
+              <Field label="Instagram URL *" type="url" value={form.instagram_url} onChange={(v) => setForm({ ...form, instagram_url: v })} required placeholder="https://instagram.com/handle" cls={inputCls} />
+              <Field label="Contact e-mail *" type="email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} required placeholder="jij@voorbeeld.nl" cls={inputCls} />
+              <Field label="Foto / logo URL" value={form.image_url} onChange={(v) => setForm({ ...form, image_url: v })} placeholder="https://... (optioneel)" cls={inputCls} />
+              <Field label="Booking link" value={form.booking_url} onChange={(v) => setForm({ ...form, booking_url: v })} placeholder="https://... (optioneel)" cls={inputCls} />
               {form.image_url && (
                 <div className="sm:col-span-2">
                   <img src={form.image_url} alt="" className="h-32 rounded-xl object-cover" />
                 </div>
               )}
-              <Field label="Prijs vanaf (€)" type="number" value={form.price_min} onChange={(v) => setForm({ ...form, price_min: v })} required cls={inputCls} />
-              <Field label="Prijs tot (€)" type="number" value={form.price_max} onChange={(v) => setForm({ ...form, price_max: v })} required cls={inputCls} />
-              <Field label="Contact e-mail" type="email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} placeholder="jij@voorbeeld.nl" cls={inputCls} />
-              <Field label="Booking link" value={form.booking_url} onChange={(v) => setForm({ ...form, booking_url: v })} placeholder="https://..." cls={inputCls} />
+              <Field label="Prijs vanaf (€)" type="number" value={form.price_min} onChange={(v) => setForm({ ...form, price_min: v })} cls={inputCls} />
+              <Field label="Prijs tot (€)" type="number" value={form.price_max} onChange={(v) => setForm({ ...form, price_max: v })} cls={inputCls} />
               <div className="sm:col-span-2">
-                <label className="block text-sm font-medium">Specialiteiten (komma-gescheiden)</label>
+                <label className="block text-sm font-medium">Specialiteiten * (komma-gescheiden)</label>
                 <input
                   className={inputCls}
                   value={form.specialties}
                   onChange={(e) => setForm({ ...form, specialties: e.target.value })}
                   placeholder="Knotless, Boho Braids, Goddess Locs"
+                  required
                 />
               </div>
               <div className="sm:col-span-2">
-                <label className="block text-sm font-medium">Korte bio</label>
+                <label className="block text-sm font-medium">Korte bio *</label>
                 <textarea
                   className={`${inputCls} min-h-28`}
                   value={form.bio}
                   onChange={(e) => setForm({ ...form, bio: e.target.value })}
+                  required
+                  minLength={10}
+                  placeholder="Vertel iets over jezelf, je stijl, en wat klanten kunnen verwachten."
                 />
               </div>
+
               <div className="sm:col-span-2 flex justify-end pt-2">
                 <button
                   type="submit"

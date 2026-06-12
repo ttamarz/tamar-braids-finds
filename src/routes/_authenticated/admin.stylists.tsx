@@ -178,8 +178,9 @@ function AdminStylists() {
       <main className="mx-auto max-w-6xl px-6 py-8">
         {adminCheck.isLoading ? null : !isAdmin ? (
           <div className="rounded-2xl bg-card border border-border/60 p-6 text-sm">
-            Je account heeft geen admin-rechten. De eerste persoon die zich registreert wordt automatisch admin.
+            Je account heeft geen admin-rechten. Neem contact op met de site-eigenaar voor toegang.
           </div>
+
         ) : null}
 
         {isAdmin && (

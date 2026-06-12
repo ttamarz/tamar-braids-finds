@@ -30,10 +30,17 @@ export function SiteHeader() {
           <Link
             to="/"
             hash="results"
+            onClick={() => {
+              setTimeout(() => {
+                const el = document.getElementById("discover-search") as HTMLInputElement | null;
+                el?.focus();
+              }, 80);
+            }}
             className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-full hover:bg-[color:var(--blush)] transition-colors"
           >
             <Search className="h-4 w-4" /> Search
           </Link>
+
           <Link
             to="/saved"
             className="inline-flex items-center gap-2 px-3 py-2 rounded-full hover:bg-[color:var(--blush)] transition-colors"
