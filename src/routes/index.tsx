@@ -120,12 +120,14 @@ function Home() {
               >
                 <MapPin className="h-5 w-5 text-muted-foreground shrink-0" />
                 <input
+                  id="discover-search"
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Zoek stad, stijl of vlechter…"
                   className="flex-1 bg-transparent outline-none text-sm sm:text-base placeholder:text-muted-foreground py-2"
                 />
+
                 {query && (
                   <button
                     type="button"
