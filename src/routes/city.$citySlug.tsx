@@ -22,7 +22,7 @@ export const Route = createFileRoute("/city/$citySlug")({
   head: ({ loaderData }) => {
     const slug = loaderData?.slug ?? "";
     const preset = getCity(slug);
-    const name = preset?.name ?? slug.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+    const name = preset?.name ?? slug.split("-").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
     const title = `Vlechters in ${name} — Tamar Finds`;
     const description = `Ontdek handgekozen vlechters in ${name}.`;
     return {
