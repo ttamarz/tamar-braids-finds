@@ -25,17 +25,18 @@ export const Route = createFileRoute("/")({
   head: () => ({
   links: [
     { rel: "icon", href: "/favicon.ico" },
-    meta: [
-      { title: "Tamar Finds | Vind Braiders & Vlechters in Nederland" },
-      {
-        name: "description",
-        content:
-          "Een handgekozen directory van vlechters in Amsterdam, Rotterdam, Utrecht, Arnhem en Den Haag.",
-      },
-      { property: "og:title", content: "Tamar Finds" },
-      { property: "og:description", content: "Find trusted braiders near you." },
-    ],
-  }),
+  ],
+  meta: [
+    { title: "Tamar Finds | Vind Braiders & Vlechters in Nederland" },
+    {
+      name: "description",
+      content:
+        "Ontdek vertrouwde braiders, hairstylists en vlechters in Nederland. Vergelijk prijzen, bekijk foto's en vind jouw volgende afspraak via Tamar Finds.",
+    },
+    { property: "og:title", content: "Tamar Finds" },
+    { property: "og:description", content: "Find trusted braiders near you." },
+  ],
+}),
   component: Home,
   errorComponent: ({ error }) => (
     <div className="p-10 text-center text-sm text-muted-foreground">{error.message}</div>
