@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getCity } from "@/data/cities";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
@@ -9,6 +10,52 @@ import { Instagram, ArrowLeft, Star, Bookmark, MapPin } from "lucide-react";
 
 const fallbackImage =
   "https://images.pexels.com/photos/37115258/pexels-photo-37115258.jpeg";
+function getStylistImages(b: Stylist) {
+  const extraImages = Array.isArray((b as any).image_urls) ? (b as any).image_urls : [];
+  return [b.image_url, ...extraImages].filter(Boolean);
+}
+
+function ImageCarousel({ images, name }: { images: string[]; name: string }) {
+  const [index, setIndex] = useState(0);
+  const safeImages = images.length ? images : [fallbackImage];
+
+  return (
+    <div className="relative h-full w-full">
+      <img
+        src={safeImages[index]}
+        alt={name}
+        loading="lazy"
+        className="h-full w-full object-cover transition-transform duration-[1200ms] group-hover:scale-105"
+      />
+
+      {safeImages.length > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              setIndex((index - 1 + safeImages.length) % safeImages.length);
+            }}
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full h-7 w-7 text-sm"
+          >
+            ‹
+          </button>
+
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              setIndex((index + 1) % safeImages.length);
+            }}
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full h-7 w-7 text-sm"
+          >
+            ›
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
 
 function slugify(name: string) {
   return name.toLowerCase().trim().replace(/\s+/g, "-");
@@ -96,12 +143,7 @@ function CityPage() {
                 className="group rounded-3xl bg-card border border-border/60 overflow-hidden shadow-sm hover:shadow-[0_20px_60px_-20px_rgba(180,80,120,0.25)] transition-all duration-500 hover:-translate-y-1"
               >
                 <div className="relative aspect-[4/5] overflow-hidden bg-muted">
-                  <img
-                    src={b.image_url || fallbackImage}
-                    alt={b.name}
-                    loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-[1200ms] group-hover:scale-105"
-                  />
+                  <ImageCarousel images={getStylistImages(b)} name={b.name} />
                   <span className="absolute top-3 left-3 inline-flex items-center gap-1 bg-[color:var(--blush)]/95 backdrop-blur text-xs font-semibold px-2.5 py-1 rounded-full">
                     <Star className="h-3 w-3 fill-[color:var(--pink)] text-[color:var(--pink)]" />
                     {Number(b.rating).toFixed(1)}
