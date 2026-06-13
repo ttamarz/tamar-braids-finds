@@ -6,47 +6,47 @@ export type City = {
 };
 
 const u = (id: string, w = 1200) =>
-  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=80`;
+  `https://images.pexels.com/photos/37115258/pexels-photo-37115258.jpeg`;
 
 export const cities: City[] = [
   {
     slug: "amsterdam",
     name: "Amsterdam",
-    tagline: "Grachten, fietsen — en de zachtste knotless van het land.",
-    cover: u("photo-1534351590666-13e3e96c5017"),
+    tagline: "De meest trendy braids en strakke lines, geïnspireerd op de non-stop energie van Dammie.",
+    cover: u("https://pixabay.com/images/download/3345557-amsterdam-6393230_1920.jpg"),
   },
   {
     slug: "rotterdam",
     name: "Rotterdam",
-    tagline: "Stoere skyline, vlechtwerk met karakter.",
-    cover: u("photo-1612521564730-09fe0a07c7b3"),
+    tagline: " Strakke braids, gedurfde styles en pure kwaliteit met de rauwe energie van Rotterdam.",
+    cover: u("https://pixabay.com/images/download/derooijfotografie-rotterdam-4152380_1920.jpg"),
   },
   {
     slug: "utrecht",
     name: "Utrecht",
-    tagline: "Klein van formaat, groot in vlechtkunst.",
-    cover: u("photo-1558551649-e44c8f992010"),
+    tagline: "Jouw go-to plek in het hart van de Domstad voor flawless braids en fresh styles.",
+    cover: u("https://pixabay.com/images/download/7162046-utrecht-4586602_1920.jpg"),
   },
   {
     slug: "arnhem",
     name: "Arnhem",
-    tagline: "Bossen, mode, en heel veel haarliefde.",
-    cover: u("photo-1518391846015-55a9cc003b25"),
+    tagline: "Creatieve designs en perfecte braids, midden in de modestad van het oosten.",
+    cover: u("https://pixabay.com/images/download/jabpaul43-bridge-5368820_1920.jpg"),
   },
   {
     slug: "den-haag",
     name: "Den Haag",
-    tagline: "Aan zee, dichtbij de koningin van je kroon.",
-    cover: u("photo-1502323777036-f29e3972d82f"),
+    tagline: "Royal treatment en premium braids met de stijlvolle vibe van de Haagse regio.",
+    cover: u("https://pixabay.com/images/download/jsh5190-night-4047217_1920.jpg"),
   },
 ];
 
 export const getCity = (slug: string) => cities.find((c) => c.slug === slug);
 
 export const styleCategories = [
-  { name: "Knotless", photo: u("photo-1531123897727-8f129e1688ce", 400) },
-  { name: "Boho Braids", photo: u("photo-1524504388940-b1c1722653e1", 400) },
-  { name: "Fulani", photo: u("photo-1605497788044-5a32c7078486", 400) },
-  { name: "Box Braids", photo: u("photo-1487412720507-e7ab37603c6f", 400) },
-  { name: "Locs", photo: u("photo-1517841905240-472988babdf9", 400) },
+  { name: "Knotless", photo: u("https://images.pexels.com/photos/7607808/pexels-photo-7607808.jpeg", 400) },
+  { name: "Boho Braids", photo: u("https://images.pexels.com/photos/28383173/pexels-photo-28383173.jpeg", 400) },
+  { name: "Fulani", photo: u("https://images.pexels.com/photos/29496369/pexels-photo-29496369.jpeg", 400) },
+  { name: "Box Braids", photo: u("https://images.pexels.com/photos/7190007/pexels-photo-7190007.jpeg", 400) },
+  { name: "Locs", photo: u("https://images.pexels.com/photos/37010087/pexels-photo-37010087.jpeg", 400) },
 ];
