@@ -8,7 +8,7 @@ import { useSavedStylists } from "@/hooks/useSavedStylists";
 import { Instagram, ArrowLeft, Star, Bookmark, MapPin } from "lucide-react";
 
 const fallbackImage =
-  "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=800&q=80";
+  "https://images.pexels.com/photos/37115258/pexels-photo-37115258.jpeg";
 
 function slugify(name: string) {
   return name.toLowerCase().trim().replace(/\s+/g, "-");
