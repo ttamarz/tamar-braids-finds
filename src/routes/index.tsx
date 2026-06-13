@@ -11,20 +11,20 @@ import { Search, MapPin, Star, Bookmark, Shield, Camera, Heart, ArrowRight, Spar
 const heroPortrait =
   "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=900&q=85";
 const polaroid1 =
-  "https://images.unsplash.com/photo-1605497788044-5a32c7078486?auto=format&fit=crop&w=500&q=85";
+  "https://images.pexels.com/photos/27987128/pexels-photo-27987128.jpeg";
 const polaroid2 =
-  "https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?auto=format&fit=crop&w=500&q=85";
+  "https://images.pexels.com/photos/27987138/pexels-photo-27987138.jpeg";
 const stylistCta =
-  "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=600&q=85";
+  "https://images.pexels.com/photos/5301538/pexels-photo-5301538.jpeg";
 
 const fallbackImage =
-  "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=800&q=80";
+  "https://images.pexels.com/photos/37115258/pexels-photo-37115258.jpeg";
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(stylistsQueryOptions),
   head: () => ({
     meta: [
-      { title: "Tamar Finds — Vind vertrouwde vlechters in Nederland" },
+      { title: "Tamar Finds | Vind Braiders & Vlechters in Nederland" },
       {
         name: "description",
         content:
