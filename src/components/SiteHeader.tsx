@@ -12,42 +12,23 @@ export function SiteHeader() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-2 text-sm font-medium">
-          <Link
-            to="/"
-            activeOptions={{ exact: true }}
-            className="px-4 py-2 rounded-full text-foreground data-[status=active]:bg-[color:var(--blush)]"
-          >
+          <Link to="/" activeOptions={{ exact: true }} className="px-4 py-2 rounded-full text-foreground data-[status=active]:bg-[color:var(--blush)]">
             Discover
           </Link>
           <Link to="/for-stylists" className="px-4 py-2 rounded-full text-foreground/80 hover:text-foreground">
             For Stylists
-          <Link
-          to="/auth"
-          className="px-4 py-2 rounded-full text-foreground/80 hover:text-foreground"
-          >
-          Login / Create Account
           </Link>
-          </nav>
+          <Link to="/auth" className="px-4 py-2 rounded-full text-foreground/80 hover:text-foreground">
+            Login / Create Account
+          </Link>
+        </nav>
 
         <div className="flex items-center gap-2 text-sm">
-          <Link
-            to="/"
-            hash="results"
-            onClick={() => {
-              setTimeout(() => {
-                const el = document.getElementById("discover-search") as HTMLInputElement | null;
-                el?.focus();
-              }, 80);
-            }}
-            className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-full hover:bg-[color:var(--blush)] transition-colors"
-          >
+          <Link to="/" hash="results" className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-full hover:bg-[color:var(--blush)] transition-colors">
             <Search className="h-4 w-4" /> Search
           </Link>
 
-          <Link
-            to="/saved"
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-full hover:bg-[color:var(--blush)] transition-colors"
-          >
+          <Link to="/saved" className="inline-flex items-center gap-2 px-3 py-2 rounded-full hover:bg-[color:var(--blush)] transition-colors">
             <Heart className="h-4 w-4" /> <span className="hidden sm:inline">Saved</span>
           </Link>
         </div>
@@ -63,8 +44,7 @@ export function SiteFooter() {
         <div>
           <img src={logo} alt="Tamar Finds" className="h-10 w-auto" />
           <p className="mt-4 text-muted-foreground max-w-md leading-relaxed">
-            Tamar Finds helpt je betrouwbare braiders en hairstylists in
-            Nederland ontdekken — zonder eindeloos zoeken op Instagram.
+            Tamar Finds helpt je betrouwbare braiders en hairstylists in Nederland ontdekken — zonder eindeloos zoeken op Instagram.
           </p>
         </div>
         <div className="sm:text-right text-sm text-muted-foreground">
