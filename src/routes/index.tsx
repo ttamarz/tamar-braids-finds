@@ -23,6 +23,8 @@ const fallbackImage =
 export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(stylistsQueryOptions),
   head: () => ({
+  links: [
+    { rel: "icon", href: "/favicon.ico" },
     meta: [
       { title: "Tamar Finds | Vind Braiders & Vlechters in Nederland" },
       {
