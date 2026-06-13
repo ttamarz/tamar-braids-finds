@@ -203,12 +203,14 @@ function CityPage() {
                   </div>
                   
                   {!b.owner_id && (
-                   <button
-                     className="mt-4 w-full rounded-full bg-[color:var(--blush)] px-4 py-2 text-sm font-semibold hover:opacity-90"
-                     >
-                     Claim This Business
-                     </button>
-                    )}
+                  <Link
+                  to="/claim-business"
+                  search={{ stylistId: b.id }}
+                  className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-[color:var(--blush)] px-4 py-2 text-sm font-semibold hover:opacity-90"
+                  >
+                  Claim This Business
+                  </Link>
+                  )}
                 </div>
               </article>
             ))}
