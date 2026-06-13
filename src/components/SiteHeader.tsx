@@ -1,13 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { Search, Heart } from "lucide-react";
-import logo from "@/assets/tamar-finds-logo.png.asset.json";
+
+const logo = "/tamar-finds-logo.png";
 
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 backdrop-blur-md bg-background/80 border-b border-border/60">
       <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between gap-6">
         <Link to="/" className="flex items-center shrink-0">
-          <img src={logo.url} alt="Tamar Finds" className="h-10 sm:h-12 w-auto" />
+          <img src={logo} alt="Tamar Finds" className="h-10 sm:h-12 w-auto" />
         </Link>
 
         <nav className="hidden md:flex items-center gap-2 text-sm font-medium">
@@ -58,7 +59,7 @@ export function SiteFooter() {
     <footer className="mt-24 border-t border-border/60 bg-[color:var(--blush)]/40">
       <div className="mx-auto max-w-7xl px-6 py-14 grid gap-10 sm:grid-cols-2">
         <div>
-          <img src={logo.url} alt="Tamar Finds" className="h-10 w-auto" />
+          <img src={logo} alt="Tamar Finds" className="h-10 w-auto" />
           <p className="mt-4 text-muted-foreground max-w-md leading-relaxed">
             Tamar Finds helpt je betrouwbare braiders en hairstylists in
             Nederland ontdekken — zonder eindeloos zoeken op Instagram.
