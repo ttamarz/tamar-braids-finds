@@ -21,7 +21,7 @@ function ClaimBusiness() {
 
     const form = new FormData(e.currentTarget);
 
-    const { error } = await (supabase as any).from("business_claims").insert({
+    const { error } = await (supabase as any).from("stylist_claims").insert({
       stylist_id: stylistId || null,
       name: String(form.get("name")),
       email: String(form.get("email")),
