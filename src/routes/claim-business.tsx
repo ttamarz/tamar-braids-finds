@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
 
 export const Route = createFileRoute("/claim-business")({
   component: ClaimBusiness,
@@ -6,44 +7,57 @@ export const Route = createFileRoute("/claim-business")({
 
 function ClaimBusiness() {
   return (
-    <div className="mx-auto max-w-2xl px-6 py-16">
-      <h1 className="font-display text-4xl">Claim This Business</h1>
+    <div className="min-h-screen">
+      <SiteHeader />
 
-      <p className="mt-4 text-muted-foreground">
-        Own this listing? Fill in your details below and we'll review your request.
-      </p>
+      <main className="mx-auto max-w-5xl px-4 sm:px-6 py-12">
+        <div className="rounded-[2rem] border border-border/60 bg-card p-8 sm:p-10">
+          <div className="mb-8">
+            <h1 className="font-display text-4xl sm:text-5xl text-foreground">
+              Claim This Business
+            </h1>
+            <p className="mt-3 text-muted-foreground text-base sm:text-lg">
+              Is dit jouw salon of braiding business? Dien een claim in en wij nemen contact met je op.
+            </p>
+          </div>
 
-      <form className="mt-8 space-y-4">
-        <input
-          type="text"
-          placeholder="Your name"
-          className="w-full rounded-xl border p-3"
-        />
+          <form className="space-y-6">
+            <input
+              type="text"
+              placeholder="Your name"
+              className="w-full rounded-full border border-border bg-background px-6 py-4 outline-none"
+            />
 
-        <input
-          type="email"
-          placeholder="Email address"
-          className="w-full rounded-xl border p-3"
-        />
+            <input
+              type="email"
+              placeholder="Email address"
+              className="w-full rounded-full border border-border bg-background px-6 py-4 outline-none"
+            />
 
-        <input
-          type="text"
-          placeholder="Instagram username"
-          className="w-full rounded-xl border p-3"
-        />
+            <input
+              type="text"
+              placeholder="Instagram username"
+              className="w-full rounded-full border border-border bg-background px-6 py-4 outline-none"
+            />
 
-        <textarea
-          placeholder="Tell us why you own this business"
-          className="w-full rounded-xl border p-3 min-h-[120px]"
-        />
+            <textarea
+              placeholder="Tell us why you own this business"
+              className="min-h-[160px] w-full rounded-[1.5rem] border border-border bg-background px-6 py-4 outline-none"
+            />
 
-        <button
-          type="submit"
-          className="rounded-full bg-[color:var(--blush)] px-6 py-3 font-semibold"
-        >
-          Submit Claim
-        </button>
-      </form>
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                className="rounded-full bg-[color:var(--cocoa)] px-8 py-3.5 font-semibold text-white hover:opacity-90"
+              >
+                Submit Claim
+              </button>
+            </div>
+          </form>
+        </div>
+      </main>
+
+      <SiteFooter />
     </div>
   );
 }
