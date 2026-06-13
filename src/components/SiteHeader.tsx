@@ -1,9 +1,26 @@
 import { Link } from "@tanstack/react-router";
 import { Search, Heart } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const logo = "/tamar-finds-logo.png";
 
 export function SiteHeader() {
+const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUserEmail(data.user?.email ?? null);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserEmail(session?.user?.email ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
   return (
     <header className="sticky top-0 z-40 backdrop-blur-md bg-background/80 border-b border-border/60">
       <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between gap-6">
@@ -18,9 +35,31 @@ export function SiteHeader() {
           <Link to="/for-stylists" className="px-4 py-2 rounded-full text-foreground/80 hover:text-foreground">
             For Stylists
           </Link>
-          <Link to="/auth" className="px-4 py-2 rounded-full text-foreground/80 hover:text-foreground">
-            Login / Create Account
-          </Link>
+         {userEmail ? (
+  <>
+    <Link
+      to="/my-listing"
+      className="px-4 py-2 rounded-full text-foreground/80 hover:text-foreground"
+    >
+      My Listing
+    </Link>
+
+    <button
+      type="button"
+      onClick={() => supabase.auth.signOut()}
+      className="px-4 py-2 rounded-full text-foreground/80 hover:text-foreground"
+    >
+      Logout
+    </button>
+  </>
+) : (
+  <Link
+    to="/auth"
+    className="px-4 py-2 rounded-full text-foreground/80 hover:text-foreground"
+  >
+    Login / Create Account
+  </Link>
+)}
         </nav>
 
         <div className="flex items-center gap-2 text-sm">
