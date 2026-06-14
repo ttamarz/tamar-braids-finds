@@ -19,16 +19,22 @@ function ForStylists() {
 
     const form = new FormData(e.currentTarget);
 
-    const { error } = await (supabase as any).from("stylist_submissions").insert({
-      name: String(form.get("name")),
-      email: String(form.get("email")),
-      city: String(form.get("city")),
-      instagram: String(form.get("instagram")),
-      specialties: String(form.get("specialties")),
-      bio: String(form.get("bio")),
-      price_range: String(form.get("price_range")),
-      booking_method: String(form.get("booking_method")),
-    });
+    const { error } = await (supabase as any).from("stylists").insert({
+  name: String(form.get("name")),
+  email: String(form.get("email")),
+  city: String(form.get("city")),
+  instagram_url: String(form.get("instagram")),
+  specialties: String(form.get("specialties"))
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean),
+  bio: String(form.get("bio")),
+  price_min: Number(form.get("price_min")),
+  price_max: Number(form.get("price_max")),
+  booking_url: String(form.get("booking_method")),
+  verified: false,
+  featured: false,
+});
 
     setLoading(false);
 
