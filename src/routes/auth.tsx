@@ -50,13 +50,18 @@ function AuthPage() {
     setLoading(true);
     try {
       if (mode === "signup") {
+  if (password !== confirmPassword) {
+    toast.error("Wachtwoorden komen niet overeen");
+    setLoading(false);
+    return;
+  }
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: { emailRedirectTo: window.location.origin + (next || "/my-listing") },
         });
         if (error) throw error;
-        toast.success("Account aangemaakt.");
+        toast.success("Account aangemaakt! Je kunt nu inloggen.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -91,7 +96,6 @@ function AuthPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="mt-1 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-[color:var(--rose)]"
               />
-            </label>
             <label className="block">
               <span className="text-sm font-medium">Wachtwoord</span>
               <input
@@ -103,6 +107,20 @@ function AuthPage() {
                 className="mt-1 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-[color:var(--rose)]"
               />
             </label>
+              </label>
+            {mode === "signup" && (
+  <label className="block">
+    <span className="text-sm font-medium">Herhaal wachtwoord</span>
+    <input
+      type="password"
+      required
+      minLength={6}
+      value={confirmPassword}
+      onChange={(e) => setConfirmPassword(e.target.value)}
+      className="mt-1 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-[color:var(--rose)]"
+    />
+  </label>
+)}
             <button
               type="submit"
               disabled={loading}
