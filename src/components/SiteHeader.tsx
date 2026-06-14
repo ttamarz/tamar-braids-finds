@@ -1,26 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { Search, Heart } from "lucide-react";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 
 const logo = "/tamar-finds-logo.png";
 
 export function SiteHeader() {
-const [userEmail, setUserEmail] = useState<string | null>(null);
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUserEmail(data.user?.email ?? null);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUserEmail(session?.user?.email ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
   return (
     <header className="sticky top-0 z-40 backdrop-blur-md bg-background/80 border-b border-border/60">
       <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between gap-6">
@@ -29,43 +12,35 @@ const [userEmail, setUserEmail] = useState<string | null>(null);
         </Link>
 
         <nav className="hidden md:flex items-center gap-2 text-sm font-medium">
-          <Link to="/" activeOptions={{ exact: true }} className="px-4 py-2 rounded-full text-foreground data-[status=active]:bg-[color:var(--blush)]">
+          <Link
+            to="/"
+            activeOptions={{ exact: true }}
+            className="px-4 py-2 rounded-full text-foreground data-[status=active]:bg-[color:var(--blush)]"
+          >
             Discover
           </Link>
-          <Link to="/for-stylists" className="px-4 py-2 rounded-full text-foreground/80 hover:text-foreground">
+
+          <Link
+            to="/for-stylists"
+            className="px-4 py-2 rounded-full text-foreground/80 hover:text-foreground"
+          >
             For Stylists
           </Link>
-         {userEmail ? (
-  <>
-    <Link
-      to="/my-listing"
-      className="px-4 py-2 rounded-full text-foreground/80 hover:text-foreground"
-    >
-      My Listing
-    </Link>
-
-    <button
-      type="button"
-      onClick={() => supabase.auth.signOut()}
-      className="px-4 py-2 rounded-full text-foreground/80 hover:text-foreground"
-    >
-      Logout
-    </button>
-  </>
-) : (
-  <Link
-    to="/auth"
-    className="px-4 py-2 rounded-full text-foreground/80 hover:text-foreground"
-  >
-)}
         </nav>
 
         <div className="flex items-center gap-2 text-sm">
-          <Link to="/" hash="results" className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-full hover:bg-[color:var(--blush)] transition-colors">
+          <Link
+            to="/"
+            hash="results"
+            className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-full hover:bg-[color:var(--blush)] transition-colors"
+          >
             <Search className="h-4 w-4" /> Search
           </Link>
 
-          <Link to="/saved" className="inline-flex items-center gap-2 px-3 py-2 rounded-full hover:bg-[color:var(--blush)] transition-colors">
+          <Link
+            to="/saved"
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-full hover:bg-[color:var(--blush)] transition-colors"
+          >
             <Heart className="h-4 w-4" /> <span className="hidden sm:inline">Saved</span>
           </Link>
         </div>
@@ -84,6 +59,7 @@ export function SiteFooter() {
             Tamar Finds helpt je betrouwbare braiders en hairstylists in Nederland ontdekken — zonder eindeloos zoeken op Instagram.
           </p>
         </div>
+
         <div className="sm:text-right text-sm text-muted-foreground">
           <p>© {new Date().getFullYear()} Tamar Finds</p>
           <p className="mt-1 italic font-[family-name:var(--font-script)] text-2xl text-foreground">
