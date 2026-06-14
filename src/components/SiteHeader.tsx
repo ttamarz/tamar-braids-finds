@@ -57,8 +57,6 @@ const [userEmail, setUserEmail] = useState<string | null>(null);
     to="/auth"
     className="px-4 py-2 rounded-full text-foreground/80 hover:text-foreground"
   >
-    Login / Create Account
-  </Link>
 )}
         </nav>
 
