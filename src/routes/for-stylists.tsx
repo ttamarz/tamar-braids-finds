@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
-import { supabase } from "@/integrations/supabase/client";
+import { submitStylistApplication } from "@/lib/stylistRequests.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/for-stylists")({
@@ -10,6 +11,7 @@ export const Route = createFileRoute("/for-stylists")({
 });
 
 function ForStylists() {
+  const submitApplication = useServerFn(submitStylistApplication);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -19,32 +21,27 @@ function ForStylists() {
 
     const form = new FormData(e.currentTarget);
 
-    const { error } = await (supabase as any).from("stylists").insert({
-  name: String(form.get("name")),
-  email: String(form.get("email")),
-  city: String(form.get("city")),
-  instagram_url: String(form.get("instagram")),
-  specialties: String(form.get("specialties"))
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean),
-  bio: String(form.get("bio")),
-  price_min: Number(form.get("price_min")),
-  price_max: Number(form.get("price_max")),
-  booking_url: String(form.get("booking_method")),
-  verified: false,
-  featured: false,
-});
+    try {
+      await submitApplication({
+        data: {
+          name: String(form.get("name")),
+          email: String(form.get("email")),
+          city: String(form.get("city")),
+          instagram: String(form.get("instagram")),
+          specialties: String(form.get("specialties")),
+          priceRange: String(form.get("priceRange")),
+          bookingMethod: String(form.get("bookingMethod")),
+          bio: String(form.get("bio")),
+        },
+      });
 
-    setLoading(false);
-
-    if (error) {
-      toast.error(error.message);
-      return;
+      setSubmitted(true);
+      toast.success("Aanvraag verstuurd!");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Er ging iets mis");
+    } finally {
+      setLoading(false);
     }
-
-    setSubmitted(true);
-    toast.success("Aanvraag verstuurd!");
   }
 
   return (
@@ -58,7 +55,7 @@ function ForStylists() {
           </h1>
 
           <p className="mt-3 text-muted-foreground">
-            Vul je gegevens in. Ik bekijk je aanvraag en voeg je listing handmatig toe aan Tamar Finds.
+            Wil je op Tamar Finds staan? Vul je gegevens in. Ik bekijk je aanvraag en voeg je handmatig toe.
           </p>
 
           {submitted ? (
@@ -75,9 +72,9 @@ function ForStylists() {
               <input name="city" required placeholder="Stad" className="w-full rounded-xl border border-border bg-background px-4 py-3" />
               <input name="instagram" required placeholder="Instagram link of @handle" className="w-full rounded-xl border border-border bg-background px-4 py-3" />
               <input name="specialties" required placeholder="Specialiteiten, bv. knotless, boho, cornrows" className="w-full rounded-xl border border-border bg-background px-4 py-3" />
-              <input name="price_range" placeholder="Prijsrange, bv. €80–€180" className="w-full rounded-xl border border-border bg-background px-4 py-3" />
-              <input name="booking_method" placeholder="Booking methode, bv. Instagram DM, WhatsApp, website" className="w-full rounded-xl border border-border bg-background px-4 py-3" />
-              <textarea name="bio" placeholder="Korte bio / extra info" className="min-h-[120px] w-full rounded-xl border border-border bg-background px-4 py-3" />
+              <input name="priceRange" required placeholder="Prijsrange, bv. €80–€180" className="w-full rounded-xl border border-border bg-background px-4 py-3" />
+              <input name="bookingMethod" placeholder="Booking methode, bv. Instagram DM, WhatsApp, website" className="w-full rounded-xl border border-border bg-background px-4 py-3" />
+              <textarea name="bio" required placeholder="Korte bio / extra info" className="min-h-[120px] w-full rounded-xl border border-border bg-background px-4 py-3" />
 
               <button
                 type="submit"
