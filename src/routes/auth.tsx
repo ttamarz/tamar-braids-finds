@@ -61,7 +61,7 @@ function AuthPage() {
           options: { emailRedirectTo: window.location.origin + (next || "/my-listing") },
         });
         if (error) throw error;
-        toast.success("Account aangemaakt! Je kunt nu inloggen.");
+        toast.success("Account aangemaakt! Controleer je e-mail om je account te bevestigen.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
