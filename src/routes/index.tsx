@@ -44,7 +44,8 @@ export const Route = createFileRoute("/")({
   notFoundComponent: () => <div className="p-10 text-center">Niet gevonden.</div>,
 });
 
-function priceTier(min: number): string {
+function priceTier(min: number | null | undefined): string | null {
+  if (!min || min <= 0) return null;
   if (min >= 180) return "€€€";
   if (min >= 120) return "€€";
   return "€";
@@ -228,18 +229,15 @@ function Home() {
                       loading="lazy"
                       className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
+                    {s.reviews_count > 0 && (
                     <span className="absolute top-2 left-2 inline-flex items-center gap-1 bg-[color:var(--blush)]/95 backdrop-blur text-[11px] font-semibold px-2 py-1 rounded-full">
-                      <Star className="h-3 w-3 fill-[color:var(--pink)] text-[color:var(--pink)]" />
-                      {Number(s.rating).toFixed(1)}
+                    <Star className="h-3 w-3 fill-[color:var(--pink)] text-[color:var(--pink)]" />
+                    {Number(s.rating).toFixed(1)}
                     </span>
+                    )}
                     {s.featured && (
                       <span className="absolute bottom-2 left-2 bg-[color:var(--rose)] text-white text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider">
                         Featured
-                      </span>
-                    )}
-                    {!s.verified && (
-                      <span className="absolute bottom-2 right-2 bg-amber-100 text-amber-900 text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                        Unverified
                       </span>
                     )}
                     <button
@@ -264,9 +262,11 @@ function Home() {
                         <MapPin className="h-3 w-3" /> {s.city}
                       </p>
                     </div>
-                    <span className="text-xs font-semibold text-[color:var(--rose)] shrink-0">
-                      {priceTier(s.price_min)}
-                    </span>
+                    <span className="text-xs font-semibold shrink-0">
+                    {priceTier(s.price_min) ?? (
+                    <span className="text-muted-foreground font-normal">Prijs op aanvraag</span>
+                    )}
+                  </span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">{s.reviews_count} reviews</p>
                 </Link>
