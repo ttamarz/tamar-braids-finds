@@ -191,19 +191,32 @@ function CityPage() {
                     ))}
                   </div>
                   <div className="mt-5 flex items-center justify-between border-t border-border/60 pt-4">
-                    <span className="text-xs text-muted-foreground">{b.reviews_count} reviews</span>
-                    {b.instagram_url && (
-                      <a
-                        href={b.instagram_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-sm font-semibold text-foreground hover:text-[color:var(--rose)] transition-colors"
-                      >
-                        <Instagram className="h-4 w-4" />
-                        Instagram
-                      </a>
-                    )}
-                  </div>
+  <span className="text-xs text-muted-foreground">{b.reviews_count} reviews</span>
+  <div className="flex items-center gap-4">
+    {b.instagram_url && (
+      
+        href={b.instagram_url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 text-sm font-semibold text-foreground hover:text-[color:var(--rose)] transition-colors"
+      >
+        <Instagram className="h-4 w-4" />
+        Instagram
+      </a>
+    )}
+    {(b.booking_url || b.instagram_url) && (
+      
+        href={b.booking_url || b.instagram_url || "#"}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 text-sm font-semibold bg-[color:var(--rose)] text-white px-4 py-2 rounded-full hover:opacity-90 transition-opacity"
+      >
+        <Calendar className="h-4 w-4" />
+        {b.booking_url ? "Book now" : "Book via Instagram"}
+      </a>
+    )}
+  </div>
+</div>
                 </div>
               </article>
             ))}
