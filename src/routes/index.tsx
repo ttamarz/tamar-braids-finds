@@ -4,6 +4,12 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { cities, styleCategories } from "@/data/cities";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
 import { useSavedStylists } from "@/hooks/useSavedStylists";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { cities, styleCategories } from "@/data/cities";
+import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
+import { useSavedStylists } from "@/hooks/useSavedStylists";
 import { stylistsQueryOptions } from "@/lib/stylistsQuery";
 import type { Stylist } from "@/lib/stylists.functions";
 import { Search, MapPin, Star, Bookmark, Shield, Camera, Heart, ArrowRight, Sparkles, Calendar } from "lucide-react";
@@ -230,10 +236,10 @@ function Home() {
                       className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                     {s.reviews_count > 0 && (
-                    <span className="absolute top-2 left-2 inline-flex items-center gap-1 bg-[color:var(--blush)]/95 backdrop-blur text-[11px] font-semibold px-2 py-1 rounded-full">
-                    <Star className="h-3 w-3 fill-[color:var(--pink)] text-[color:var(--pink)]" />
-                    {Number(s.rating).toFixed(1)}
-                    </span>
+                      <span className="absolute top-2 left-2 inline-flex items-center gap-1 bg-[color:var(--blush)]/95 backdrop-blur text-[11px] font-semibold px-2 py-1 rounded-full">
+                        <Star className="h-3 w-3 fill-[color:var(--pink)] text-[color:var(--pink)]" />
+                        {Number(s.rating).toFixed(1)}
+                      </span>
                     )}
                     {s.featured && (
                       <span className="absolute bottom-2 left-2 bg-[color:var(--rose)] text-white text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider">
@@ -254,6 +260,18 @@ function Home() {
                         className={`h-3.5 w-3.5 ${isSaved(s.id) ? "fill-[color:var(--rose)] text-[color:var(--rose)]" : ""}`}
                       />
                     </button>
+                    {(s.booking_url || s.instagram_url) && (
+                      
+                        href={s.booking_url || s.instagram_url || "#"}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        aria-label="Book"
+                        className="absolute top-2 right-11 h-7 w-7 bg-white/90 rounded-full flex items-center justify-center hover:bg-white"
+                      >
+                        <Calendar className="h-3.5 w-3.5" />
+                      </a>
+                    )}
                   </div>
                   <div className="mt-3 flex items-start justify-between gap-2">
                     <div className="min-w-0">
@@ -263,25 +281,13 @@ function Home() {
                       </p>
                     </div>
                     <span className="text-xs font-semibold shrink-0">
-                    {priceTier(s.price_min) ?? (
-                    <span className="text-muted-foreground font-normal">Prijs op aanvraag</span>
-                    )}
-                  </span>
+                      {priceTier(s.price_min) ?? (
+                        <span className="text-muted-foreground font-normal">Prijs op aanvraag</span>
+                      )}
+                    </span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">{s.reviews_count} reviews</p>
                 </Link>
-              {(s.booking_url || s.instagram_url) && (
-  
-    href={s.booking_url || s.instagram_url || "#"}
-    target="_blank"
-    rel="noopener noreferrer"
-    onClick={(e) => e.stopPropagation()}
-    aria-label="Book"
-    className="absolute top-2 right-11 h-7 w-7 bg-white/90 rounded-full flex items-center justify-center hover:bg-white"
-  >
-    <Calendar className="h-3.5 w-3.5" />
-  </a>
-)}
               ))}
             </div>
           )}
@@ -367,7 +373,6 @@ function Home() {
           </Link>
         </div>
       </section>
-
 
       <SiteFooter />
     </div>
