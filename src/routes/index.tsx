@@ -64,7 +64,7 @@ function Home() {
   const isSearching = trimmed.length > 0;
 
   const results = useMemo(() => {
-    if (!isSearching) return stylists.slice(0, 8);
+    if (!isSearching) return [];
     return stylists.filter((s: Stylist) => {
       const hay = [
         s.name,
@@ -198,11 +198,18 @@ function Home() {
             ) : null}
           </div>
 
-          {results.length === 0 ? (
+          {!isSearching ? (
             <div className="py-16 text-center">
-              <p className="font-display text-2xl">Geen resultaten</p>
+              <p className="font-display text-2xl">Find your braider</p>
               <p className="mt-2 text-sm text-muted-foreground">
-                Probeer een andere stad, stijl of vlechternaam.
+                Search by city, style, or stylist name above to see results.
+              </p>
+            </div>
+          ) : results.length === 0 ? (
+            <div className="py-16 text-center">
+              <p className="font-display text-2xl">No results</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Try a different city, style, or stylist name.
               </p>
             </div>
           ) : (
