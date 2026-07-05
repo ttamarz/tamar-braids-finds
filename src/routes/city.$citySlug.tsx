@@ -145,11 +145,11 @@ function CityPage() {
                 <div className="relative aspect-[4/5] overflow-hidden bg-muted">
                   <ImageCarousel images={getStylistImages(b)} name={b.name} />
                   {b.reviews_count > 0 && (
-                  <span className="absolute top-3 left-3 inline-flex items-center gap-1 bg-[color:var(--blush)]/95 backdrop-blur text-xs font-semibold px-2.5 py-1 rounded-full">
-                   <Star className="h-3 w-3 fill-[color:var(--pink)] text-[color:var(--pink)]" />
-                    {Number(b.rating).toFixed(1)}
+                    <span className="absolute top-3 left-3 inline-flex items-center gap-1 bg-[color:var(--blush)]/95 backdrop-blur text-xs font-semibold px-2.5 py-1 rounded-full">
+                      <Star className="h-3 w-3 fill-[color:var(--pink)] text-[color:var(--pink)]" />
+                      {Number(b.rating).toFixed(1)}
                     </span>
-                    )}
+                  )}
                   {b.featured && (
                     <span className="absolute bottom-3 left-3 bg-[color:var(--rose)] text-white text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider">
                       Featured
@@ -173,14 +173,14 @@ function CityPage() {
                       </p>
                     </div>
                     <span className="shrink-0 text-xs uppercase tracking-[0.18em] font-semibold">
-  {b.price_min > 0 ? (
-    <span className="text-[color:var(--rose)]">
-      €{b.price_min}{b.price_max > b.price_min ? `–${b.price_max}` : ""}
-    </span>
-  ) : (
-    <span className="text-muted-foreground font-normal">Prijs op aanvraag</span>
-  )}
-</span>
+                      {b.price_min > 0 ? (
+                        <span className="text-[color:var(--rose)]">
+                          €{b.price_min}{b.price_max > b.price_min ? `–${b.price_max}` : ""}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground font-normal">Prijs op aanvraag</span>
+                      )}
+                    </span>
                   </div>
                   {b.bio && <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{b.bio}</p>}
                   <div className="mt-4 flex flex-wrap gap-2">
@@ -191,32 +191,32 @@ function CityPage() {
                     ))}
                   </div>
                   <div className="mt-5 flex items-center justify-between border-t border-border/60 pt-4">
-  <span className="text-xs text-muted-foreground">{b.reviews_count} reviews</span>
-  <div className="flex items-center gap-4">
-    {b.instagram_url && (
-      
-        href={b.instagram_url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 text-sm font-semibold text-foreground hover:text-[color:var(--rose)] transition-colors"
-      >
-        <Instagram className="h-4 w-4" />
-        Instagram
-      </a>
-    )}
-    {(b.booking_url || b.instagram_url) && (
-      
-        href={b.booking_url || b.instagram_url || "#"}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 text-sm font-semibold bg-[color:var(--rose)] text-white px-4 py-2 rounded-full hover:opacity-90 transition-opacity"
-      >
-        <Calendar className="h-4 w-4" />
-        {b.booking_url ? "Book now" : "Book via Instagram"}
-      </a>
-    )}
-  </div>
-</div>
+                    <span className="text-xs text-muted-foreground">{b.reviews_count} reviews</span>
+                    <div className="flex items-center gap-4">
+                      {b.instagram_url && (
+                        
+                          href={b.instagram_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 text-sm font-semibold text-foreground hover:text-[color:var(--rose)] transition-colors"
+                        >
+                          <Instagram className="h-4 w-4" />
+                          Instagram
+                        </a>
+                      )}
+                      {(b.booking_url || b.instagram_url) && (
+                        
+                          href={b.booking_url || b.instagram_url || "#"}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 text-sm font-semibold bg-[color:var(--rose)] text-white px-4 py-2 rounded-full hover:opacity-90 transition-opacity"
+                        >
+                          <Calendar className="h-4 w-4" />
+                          {b.booking_url ? "Book now" : "Book via Instagram"}
+                        </a>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </article>
             ))}
