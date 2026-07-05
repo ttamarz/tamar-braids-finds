@@ -6,7 +6,7 @@ import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
 import { stylistsQueryOptions } from "@/lib/stylistsQuery";
 import type { Stylist } from "@/lib/stylists.functions";
 import { useSavedStylists } from "@/hooks/useSavedStylists";
-import { Instagram, ArrowLeft, Star, Bookmark, MapPin } from "lucide-react";
+import { Instagram, ArrowLeft, Star, Bookmark, MapPin, Calendar } from "lucide-react";
 
 const fallbackImage =
   "https://images.pexels.com/photos/37115258/pexels-photo-37115258.jpeg";
