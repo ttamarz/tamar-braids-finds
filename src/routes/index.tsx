@@ -6,7 +6,7 @@ import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
 import { useSavedStylists } from "@/hooks/useSavedStylists";
 import { stylistsQueryOptions } from "@/lib/stylistsQuery";
 import type { Stylist } from "@/lib/stylists.functions";
-import { Search, MapPin, Star, Bookmark, Shield, Camera, Heart, ArrowRight, Sparkles } from "lucide-react";
+import { Search, MapPin, Star, Bookmark, Shield, Camera, Heart, ArrowRight, Sparkles, Calendar } from "lucide-react";
 
 const heroPortrait =
   "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=900&q=85";
@@ -270,6 +270,18 @@ function Home() {
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">{s.reviews_count} reviews</p>
                 </Link>
+              {(s.booking_url || s.instagram_url) && (
+  
+    href={s.booking_url || s.instagram_url || "#"}
+    target="_blank"
+    rel="noopener noreferrer"
+    onClick={(e) => e.stopPropagation()}
+    aria-label="Book"
+    className="absolute top-2 right-11 h-7 w-7 bg-white/90 rounded-full flex items-center justify-center hover:bg-white"
+  >
+    <Calendar className="h-3.5 w-3.5" />
+  </a>
+)}
               ))}
             </div>
           )}
