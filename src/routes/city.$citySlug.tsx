@@ -144,18 +144,15 @@ function CityPage() {
               >
                 <div className="relative aspect-[4/5] overflow-hidden bg-muted">
                   <ImageCarousel images={getStylistImages(b)} name={b.name} />
+                  {b.reviews_count > 0 && (
                   <span className="absolute top-3 left-3 inline-flex items-center gap-1 bg-[color:var(--blush)]/95 backdrop-blur text-xs font-semibold px-2.5 py-1 rounded-full">
-                    <Star className="h-3 w-3 fill-[color:var(--pink)] text-[color:var(--pink)]" />
+                   <Star className="h-3 w-3 fill-[color:var(--pink)] text-[color:var(--pink)]" />
                     {Number(b.rating).toFixed(1)}
-                  </span>
+                    </span>
+                    )}
                   {b.featured && (
                     <span className="absolute bottom-3 left-3 bg-[color:var(--rose)] text-white text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider">
                       Featured
-                    </span>
-                  )}
-                  {!b.verified && (
-                    <span className="absolute bottom-3 right-3 bg-amber-100 text-amber-900 text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                      Unverified
                     </span>
                   )}
                   <button
@@ -175,9 +172,15 @@ function CityPage() {
                         <MapPin className="h-3 w-3" /> {b.city}
                       </p>
                     </div>
-                    <span className="shrink-0 text-xs uppercase tracking-[0.18em] text-[color:var(--rose)] font-semibold">
-                      €{b.price_min}{b.price_max > b.price_min ? `–${b.price_max}` : ""}
-                    </span>
+                    <span className="shrink-0 text-xs uppercase tracking-[0.18em] font-semibold">
+  {b.price_min > 0 ? (
+    <span className="text-[color:var(--rose)]">
+      €{b.price_min}{b.price_max > b.price_min ? `–${b.price_max}` : ""}
+    </span>
+  ) : (
+    <span className="text-muted-foreground font-normal">Prijs op aanvraag</span>
+  )}
+</span>
                   </div>
                   {b.bio && <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{b.bio}</p>}
                   <div className="mt-4 flex flex-wrap gap-2">
