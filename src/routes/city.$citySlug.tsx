@@ -205,7 +205,7 @@ function CityPage() {
                         </a>
                       )}
                       {(b.booking_url || b.instagram_url) && (
-                        
+                        <a
                           href={b.booking_url || b.instagram_url || "#"}
                           target="_blank"
                           rel="noopener noreferrer"
