@@ -255,7 +255,7 @@ function Home() {
                       />
                     </button>
                     {(s.booking_url || s.instagram_url) && (
-                      
+                      <a
                         href={s.booking_url || s.instagram_url || "#"}
                         target="_blank"
                         rel="noopener noreferrer"
