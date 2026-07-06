@@ -194,7 +194,7 @@ function CityPage() {
                     <span className="text-xs text-muted-foreground">{b.reviews_count} reviews</span>
                     <div className="flex items-center gap-4">
                       {b.instagram_url && (
-                        
+                        <a
                           href={b.instagram_url}
                           target="_blank"
                           rel="noopener noreferrer"
