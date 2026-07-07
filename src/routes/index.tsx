@@ -6,7 +6,7 @@ import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
 import { useSavedStylists } from "@/hooks/useSavedStylists";
 import { stylistsQueryOptions } from "@/lib/stylistsQuery";
 import type { Stylist } from "@/lib/stylists.functions";
-import { Search, MapPin, Star, Bookmark, Shield, Camera, Heart, ArrowRight, Sparkles, Calendar } from "lucide-react";
+import { Search, MapPin, Star, Bookmark, Shield, Camera, Heart, ArrowRight, Sparkles, Calendar, SlidersHorizontal, X } from "lucide-react";
 
 const heroPortrait =
   "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=900&q=85";
@@ -19,6 +19,12 @@ const stylistCta =
 
 const fallbackImage =
   "https://images.pexels.com/photos/37115258/pexels-photo-37115258.jpeg";
+
+const priceOptions = [
+  { label: "€", value: "€" },
+  { label: "€€", value: "€€" },
+  { label: "€€€", value: "€€€" },
+];
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(stylistsQueryOptions),
@@ -60,25 +66,47 @@ function Home() {
   const { data: stylists } = useSuspenseQuery(stylistsQueryOptions);
   const { isSaved, toggle } = useSavedStylists();
   const [query, setQuery] = useState("");
+  const [selectedCity, setSelectedCity] = useState("");
+  const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
+  const [selectedPrice, setSelectedPrice] = useState("");
 
   const trimmed = query.trim().toLowerCase();
-  const isSearching = trimmed.length > 0;
+  const hasFilters = Boolean(selectedCity || selectedStyles.length || selectedPrice);
+  const isSearching = trimmed.length > 0 || hasFilters;
+
+  const toggleStyle = (styleName: string) => {
+    setSelectedStyles((prev) =>
+      prev.includes(styleName) ? prev.filter((s) => s !== styleName) : [...prev, styleName]
+    );
+  };
+
+  const clearFilters = () => {
+    setSelectedCity("");
+    setSelectedStyles([]);
+    setSelectedPrice("");
+  };
 
   const results = useMemo(() => {
     if (!isSearching) return [];
     return stylists.filter((s: Stylist) => {
-      const hay = [
-        s.name,
-        s.bio ?? "",
-        s.instagram_url ?? "",
-        s.city,
-        ...s.specialties,
-      ]
-        .join(" ")
-        .toLowerCase();
-      return hay.includes(trimmed);
+      if (trimmed) {
+        const hay = [s.name, s.bio ?? "", s.instagram_url ?? "", s.city, ...s.specialties]
+          .join(" ")
+          .toLowerCase();
+        if (!hay.includes(trimmed)) return false;
+      }
+      if (selectedCity && s.city.toLowerCase() !== selectedCity.toLowerCase()) return false;
+      if (selectedStyles.length) {
+        const specialtiesLower = s.specialties.map((sp) => sp.toLowerCase());
+        const matchesStyle = selectedStyles.some((sel) =>
+          specialtiesLower.some((sp) => sp.includes(sel.toLowerCase()) || sel.toLowerCase().includes(sp))
+        );
+        if (!matchesStyle) return false;
+      }
+      if (selectedPrice && priceTier(s.price_min) !== selectedPrice) return false;
+      return true;
     });
-  }, [trimmed, isSearching, stylists]);
+  }, [trimmed, isSearching, stylists, selectedCity, selectedStyles, selectedPrice]);
 
   const scrollToResults = () => {
     setTimeout(() => {
@@ -185,32 +213,36 @@ function Home() {
             <h2 className="font-display text-2xl flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-[color:var(--pink)]" />
               <span className="uppercase tracking-[0.15em] text-sm font-semibold text-foreground">
-                {isSearching ? `Resultaten · ${results.length}` : "Featured Stylists"}
+                {isSearching ? `Resultaten · ${results.length}` : "Zoek om te beginnen"}
               </span>
             </h2>
             {isSearching ? (
               <button
                 type="button"
-                onClick={() => setQuery("")}
+                onClick={() => {
+                  setQuery("");
+                  clearFilters();
+                }}
                 className="text-sm font-medium inline-flex items-center gap-1 text-foreground hover:text-[color:var(--rose)]"
               >
-                Wis zoekopdracht
+                Wis alles
               </button>
             ) : null}
           </div>
 
           {!isSearching ? (
             <div className="py-16 text-center">
-              <p className="font-display text-2xl">Find your braider</p>
+              <Search className="h-8 w-8 mx-auto text-muted-foreground" />
+              <p className="font-display text-2xl mt-3">Vind jouw vlechter</p>
               <p className="mt-2 text-sm text-muted-foreground">
-                Search by city, style, or stylist name above to see results.
+                Zoek hierboven of gebruik de filters om resultaten te zien.
               </p>
             </div>
           ) : results.length === 0 ? (
             <div className="py-16 text-center">
-              <p className="font-display text-2xl">No results</p>
+              <p className="font-display text-2xl">Geen resultaten</p>
               <p className="mt-2 text-sm text-muted-foreground">
-                Try a different city, style, or stylist name.
+                Probeer een andere stad, stijl of prijsklasse.
               </p>
             </div>
           ) : (
@@ -255,7 +287,7 @@ function Home() {
                       />
                     </button>
                     {(s.booking_url || s.instagram_url) && (
-                      <a
+                      
                         href={s.booking_url || s.instagram_url || "#"}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -289,21 +321,88 @@ function Home() {
 
         <aside className="flex flex-col gap-6">
           <div className="rounded-[1.5rem] bg-card border border-border/60 p-6">
-            <h2 className="uppercase tracking-[0.15em] text-sm font-semibold mb-5">Browse by style</h2>
-            <div className="grid grid-cols-5 gap-3">
-              {styleCategories.map((s) => (
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="uppercase tracking-[0.15em] text-sm font-semibold flex items-center gap-2">
+                <SlidersHorizontal className="h-4 w-4 text-[color:var(--rose)]" />
+                Filters
+              </h2>
+              {hasFilters && (
                 <button
-                  key={s.name}
                   type="button"
-                  onClick={() => setQueryAndScroll(s.name)}
-                  className="group text-center"
+                  onClick={clearFilters}
+                  className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
                 >
-                  <div className="aspect-square rounded-full overflow-hidden ring-2 ring-[color:var(--blush)] group-hover:ring-[color:var(--pink)] transition-all">
-                    <img src={s.photo} alt={s.name} loading="lazy" className="h-full w-full object-cover" />
-                  </div>
-                  <p className="mt-2 text-[11px] leading-tight font-medium">{s.name}</p>
+                  <X className="h-3 w-3" /> Wis
                 </button>
-              ))}
+              )}
+            </div>
+
+            <div className="mb-5">
+              <p className="text-xs font-semibold text-muted-foreground mb-2">Stad</p>
+              <select
+                value={selectedCity}
+                onChange={(e) => {
+                  setSelectedCity(e.target.value);
+                  scrollToResults();
+                }}
+                className="w-full rounded-full border border-border bg-background px-4 py-2 text-sm"
+              >
+                <option value="">Alle steden</option>
+                {cities.map((c) => (
+                  <option key={c.slug} value={c.name}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="mb-5">
+              <p className="text-xs font-semibold text-muted-foreground mb-2">Stijl</p>
+              <div className="flex flex-wrap gap-2">
+                {styleCategories.map((sc) => {
+                  const active = selectedStyles.includes(sc.name);
+                  return (
+                    <button
+                      key={sc.name}
+                      type="button"
+                      onClick={() => {
+                        toggleStyle(sc.name);
+                        scrollToResults();
+                      }}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                        active
+                          ? "bg-[color:var(--rose)] text-white border-[color:var(--rose)]"
+                          : "border-border bg-background hover:bg-[color:var(--blush)]"
+                      }`}
+                    >
+                      {sc.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs font-semibold text-muted-foreground mb-2">Prijsklasse</p>
+              <div className="flex gap-2">
+                {priceOptions.map((p) => (
+                  <button
+                    key={p.value}
+                    type="button"
+                    onClick={() => {
+                      setSelectedPrice(selectedPrice === p.value ? "" : p.value);
+                      scrollToResults();
+                    }}
+                    className={`flex-1 py-2 rounded-full text-sm font-semibold border transition-colors ${
+                      selectedPrice === p.value
+                        ? "bg-[color:var(--rose)] text-white border-[color:var(--rose)]"
+                        : "border-border bg-background hover:bg-[color:var(--blush)]"
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
