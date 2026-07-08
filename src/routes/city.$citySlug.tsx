@@ -216,16 +216,16 @@ function CityPage() {
                           Instagram
                         </a>
                       )}
-                      {(b.booking_url || b.instagram_url) && (
-                        <a
-                          href={b.booking_url || b.instagram_url || "#"}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 text-sm font-semibold bg-[color:var(--rose)] text-white px-4 py-2 rounded-full hover:opacity-90 transition-opacity"
-                        >
-                          <Calendar className="h-4 w-4" />
-                          {b.booking_url ? "Book now" : "Book via Instagram"}
-                        </a>
+                      {b.booking_url && (
+                      <a
+                      href={b.booking_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-sm font-semibold bg-[color:var(--rose)] text-white px-4 py-2 rounded-full hover:opacity-90 transition-opacity"
+                      >
+                      <Calendar className="h-4 w-4" />
+                      Book now
+                      </a>
                       )}
                     </div>
                   </div>
