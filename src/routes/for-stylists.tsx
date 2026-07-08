@@ -22,18 +22,19 @@ function ForStylists() {
     const form = new FormData(e.currentTarget);
 
     try {
-      await submitApplication({
-        data: {
-          name: String(form.get("name")),
-          email: String(form.get("email")),
-          city: String(form.get("city")),
-          instagram: String(form.get("instagram")),
-          specialties: String(form.get("specialties")),
-          priceRange: String(form.get("priceRange")),
-          bookingMethod: String(form.get("bookingMethod")),
-          bio: String(form.get("bio")),
-        },
-      });
+     await submitApplication({
+  data: {
+    name: String(form.get("name")),
+    email: String(form.get("email")),
+    city: String(form.get("city")),
+    instagram_url: String(form.get("instagram_url")),
+    specialties: String(form.get("specialties")),
+    price_min: Number(form.get("price_min")),
+    price_max: Number(form.get("price_max")),
+    booking_method: String(form.get("booking_method")),
+    bio: String(form.get("bio")),
+  },
+});
 
       setSubmitted(true);
       toast.success("Aanvraag verstuurd!");
