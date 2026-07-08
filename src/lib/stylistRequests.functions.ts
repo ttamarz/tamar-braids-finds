@@ -58,16 +58,3 @@ export const submitStylistApplication = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
-STYLIST APPLICATION
-
-Instagram: ${data.instagram}
-Booking method: ${data.bookingMethod || "Not provided"}
-
-Bio:
-${data.bio}
-      `.trim(),
-    });
-
-    if (error) throw new Error(error.message);
-    return { ok: true };
-  });
