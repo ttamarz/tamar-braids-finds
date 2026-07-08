@@ -285,19 +285,19 @@ function Home() {
                       <Bookmark
                         className={`h-3.5 w-3.5 ${isSaved(s.id) ? "fill-[color:var(--rose)] text-[color:var(--rose)]" : ""}`}
                       />
-                    </button>
-                    {(s.booking_url || s.instagram_url) && (
-                      <a
-                        href={s.booking_url || s.instagram_url || "#"}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        aria-label="Book"
-                        className="absolute top-2 right-11 h-7 w-7 bg-white/90 rounded-full flex items-center justify-center hover:bg-white"
-                      >
-                        <Calendar className="h-3.5 w-3.5" />
-                      </a>
-                    )}
+                  </button>
+                  {s.booking_url && (
+                  <a
+                  href={s.booking_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  aria-label="Book"
+                  className="absolute top-2 right-11 h-7 w-7 bg-white/90 rounded-full flex items-center justify-center hover:bg-white"
+                  >
+                  <Calendar className="h-3.5 w-3.5" />
+                  </a>
+                  )}  
                   </div>
                   <div className="mt-3 flex items-start justify-between gap-2">
                     <div className="min-w-0">
