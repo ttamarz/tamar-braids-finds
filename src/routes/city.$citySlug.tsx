@@ -51,6 +51,17 @@ function ImageCarousel({ images, name }: { images: string[]; name: string }) {
           >
             ›
           </button>
+
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+            {safeImages.map((_, i) => (
+              <span
+                key={i}
+                className={`h-1.5 rounded-full transition-all ${
+                  i === index ? "w-4 bg-white" : "w-1.5 bg-white/60"
+                }`}
+              />
+            ))}
+          </div>
         </>
       )}
     </div>
