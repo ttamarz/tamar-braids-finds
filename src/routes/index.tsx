@@ -429,10 +429,10 @@ function Home() {
       <section className="mx-auto max-w-7xl px-4 sm:px-6 mt-10">
         <div className="rounded-[1.5rem] bg-card border border-border/60 p-6 sm:p-8 grid grid-cols-2 sm:grid-cols-4 gap-6">
           {[
-            { icon: Shield, title: "Vetted Stylists", body: "Alleen vertrouwde, ervaren vlechters." },
-            { icon: Camera, title: "Real Photo Reviews", body: "Zie échte resultaten van echte klanten." },
-            { icon: MapPin, title: "Find Nearby", body: "Zoek per stad en ontdek lokaal talent." },
-            { icon: Heart, title: "Save Your Favorites", body: "Bookmark je dream-braiders." },
+            { icon: Shield, title: "Ontdek Lokaal Talent", body: "Braiders en vlechters bij jou in de buurt." },
+            { icon: Camera, title: "Echte Reviews", body: "Lees ervaringen en bekijk foto's van echte klanten." },
+            { icon: MapPin, title: "Zoek Op Stad", body: "Filter op stad, stijl en prijsklasse." },
+            { icon: Heart, title: "Bewaar Favorieten", body: "Bookmark je dream-braiders voor later." },
           ].map((f) => (
             <div key={f.title} className="text-center">
               <div className="mx-auto h-12 w-12 rounded-full bg-[color:var(--blush)] flex items-center justify-center">
