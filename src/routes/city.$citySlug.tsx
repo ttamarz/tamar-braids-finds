@@ -6,6 +6,7 @@ import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
 import { stylistsQueryOptions } from "@/lib/stylistsQuery";
 import type { Stylist } from "@/lib/stylists.functions";
 import { useSavedStylists } from "@/hooks/useSavedStylists";
+import { StylistReviews } from "@/components/StylistReviews";
 import { Instagram, ArrowLeft, Star, Bookmark, MapPin, Calendar } from "lucide-react";
 
 const fallbackImage =
