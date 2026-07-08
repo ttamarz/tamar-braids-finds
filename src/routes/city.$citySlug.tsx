@@ -229,6 +229,7 @@ function CityPage() {
                       )}
                     </div>
                   </div>
+                  <StylistReviews stylistId={b.id} />
                 </div>
               </article>
             ))}
