@@ -68,15 +68,13 @@ function ForStylists() {
             </div>
           ) : (
             <form onSubmit={onSubmit} className="mt-8 space-y-4">
-              <input name="name" required placeholder="Naam / business naam" className="w-full rounded-xl border border-border bg-background px-4 py-3" />
-              <input name="email" required type="email" placeholder="E-mail" className="w-full rounded-xl border border-border bg-background px-4 py-3" />
-              <input name="city" required placeholder="Stad" className="w-full rounded-xl border border-border bg-background px-4 py-3" />
-              <input name="instagram" required placeholder="Instagram link of @handle" className="w-full rounded-xl border border-border bg-background px-4 py-3" />
-              <input name="specialties" required placeholder="Specialiteiten, bv. knotless, boho, cornrows" className="w-full rounded-xl border border-border bg-background px-4 py-3" />
-              <input name="priceRange" required placeholder="Prijsrange, bv. €80–€180" className="w-full rounded-xl border border-border bg-background px-4 py-3" />
-              <input name="bookingMethod" placeholder="Booking methode, bv. Instagram DM, WhatsApp, website" className="w-full rounded-xl border border-border bg-background px-4 py-3" />
-              <textarea name="bio" required placeholder="Korte bio / extra info" className="min-h-[120px] w-full rounded-xl border border-border bg-background px-4 py-3" />
-
+              <input name="instagram_url" required type="url" placeholder="Instagram link (https://instagram.com/...)" className="w-full rounded-xl border border-border bg-background px-4 py-3" />
+              <input name="specialties" required placeholder="Specialiteiten, bv. Knotless, Boho, Cornrows" className="w-full rounded-xl border border-border bg-background px-4 py-3" />
+              <div className="flex gap-3">
+                  <input name="price_min" required type="number" min="0" placeholder="Prijs vanaf (€)" className="w-full rounded-xl border border-border bg-background px-4 py-3" />
+                  <input name="price_max" required type="number" min="0" placeholder="Prijs tot (€)" className="w-full rounded-xl border border-border bg-background px-4 py-3" />
+              </div>
+              <input name="booking_method" placeholder="Booking methode, bv. Instagram DM, WhatsApp, website" className="w-full rounded-xl border border-border bg-background px-4 py-3" />
               <button
                 type="submit"
                 disabled={loading}
