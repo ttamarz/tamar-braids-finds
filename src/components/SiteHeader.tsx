@@ -56,7 +56,7 @@ export function SiteFooter() {
         <div>
           <img src={logo} alt="Tamar Finds" className="h-10 w-auto" />
           <p className="mt-4 text-muted-foreground max-w-md leading-relaxed">
-            Tamar Finds helpt je betrouwbare braiders en hairstylists in Nederland ontdekken — zonder eindeloos zoeken op Instagram.
+            Tamar Finds helpt je betrouwbare braiders en hairstylists in Nederland ontdekken, zonder eindeloos zoeken op Instagram.
           </p>
         </div>
 
